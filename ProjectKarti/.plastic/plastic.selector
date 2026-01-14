@@ -1,0 +1,4 @@
+repository "ProjectKarti/ProjectKarti@7972274131050@cloud"
+  path "/"
+    br "/main"
+    co "/main"
