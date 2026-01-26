@@ -1,13 +1,11 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
-public class MainMenuUI : MonoBehaviour
+public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private GameObject mainMenuPanel;
-
-
-    public void Play()
+    public void PlayGame()
     {
-        mainMenuPanel.SetActive(false);
+        SceneManager.LoadScene("SampleScene");
     }
 }
