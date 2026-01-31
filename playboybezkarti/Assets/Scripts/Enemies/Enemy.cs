@@ -2,49 +2,53 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    [Header("Stats")]
-    public float maxHealth = 10f;
-    public float moveSpeed = 2f;
+    public float speed = 2f;
+    public float detectionRange = 5f;
 
-    float currentHealth;
-    Vector2 moveDirection;
+    private Transform player;
+    private Rigidbody2D rb;
+    private Animator animator;
 
-    protected virtual void Start()
+    void Start()
     {
-        currentHealth = maxHealth;
+        rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
 
-        // Pick a random direction at start
-        moveDirection = Random.insideUnitCircle.normalized;
+        animator.SetBool("IsMoving", false);
     }
 
-    protected virtual void Update()
+    void Update()
     {
-        Move();
-    }
+        FindPlayerIfNeeded();
 
-    protected virtual void Move()
-    {
-        // Move in the random direction
-        transform.position += (Vector3)moveDirection * moveSpeed * Time.deltaTime;
-
-        // Bounce off screen edges (optional)
-        Vector3 pos = transform.position;
-        if (pos.x > 10f || pos.x < -10f) moveDirection.x *= -1;
-        if (pos.y > 5f || pos.y < -5f) moveDirection.y *= -1;
-    }
-
-    public virtual void TakeDamage(float damage)
-    {
-        currentHealth -= damage;
-
-        if (currentHealth <= 0f)
+        if (player == null)
         {
-            Die();
+            rb.linearVelocity = Vector2.zero;
+            animator.SetBool("IsMoving", false);
+            return;
+        }
+
+        float distance = Vector2.Distance(transform.position, player.position);
+
+        if (distance <= detectionRange)
+        {
+            Vector2 direction = (player.position - transform.position).normalized;
+            rb.linearVelocity = direction * speed;
+            animator.SetBool("IsMoving", true);
+        }
+        else
+        {
+            rb.linearVelocity = Vector2.zero;
+            animator.SetBool("IsMoving", false);
         }
     }
 
-    protected virtual void Die()
+    void FindPlayerIfNeeded()
     {
-        Destroy(gameObject);
+        if (player != null) return;
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+            player = playerObj.transform;
     }
 }
