@@ -2,6 +2,12 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Health Settings")]
+    public float maxHealth = 50f;
+    private float currentHealth;
+    public GameObject deathEffect; // Optional: Drag a particle effect here later
+
+    [Header("Movement Settings")]
     public float speed = 2f;
     public float detectionRange = 5f;
 
@@ -10,16 +16,18 @@ public class Enemy : MonoBehaviour
     private Animator animator;
 
     [Header("Combat Settings")]
-    public float attackRange = 1.2f;    // How close to be to start attacking
-    public float attackRate = 1.5f;     // Seconds between attacks (cooldown)
-    private float nextAttackTime = 0f;  // Internal timer to track when we can hit again
+    public float attackRange = 1.2f;
+    public float attackRate = 1.5f;
+    private float nextAttackTime = 0f;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // Initialization safety
+        // Initialize HP
+        currentHealth = maxHealth;
+
         if (animator != null) animator.SetBool("IsMoving", false);
     }
 
@@ -35,22 +43,48 @@ public class Enemy : MonoBehaviour
 
         float distance = Vector2.Distance(transform.position, player.position);
 
-        // 1. Check for Attack Range first (Priority)
         if (distance <= attackRange)
         {
             AttackPlayer();
         }
-        // 2. If not attacking, check for Detection Range to Move
         else if (distance <= detectionRange)
         {
             MoveToPlayer();
         }
-        // 3. Out of range entirely
         else
         {
             StopMoving();
         }
     }
+
+    // --- HEALTH LOGIC ---
+    public void TakeDamage(float damageAmount)
+    {
+        currentHealth -= damageAmount;
+        Debug.Log("Evil Tree took damage! HP left: " + currentHealth);
+
+        // Play "Hurt" animation if you have one
+        if (animator != null) animator.SetTrigger("Hurt");
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    void Die()
+    {
+        Debug.Log("Evil Tree has been chopped down!");
+
+        // If you have a death effect prefab, spawn it
+        if (deathEffect != null)
+        {
+            Instantiate(deathEffect, transform.position, Quaternion.identity);
+        }
+
+        Destroy(gameObject);
+    }
+    // --- END HEALTH LOGIC ---
 
     void MoveToPlayer()
     {
@@ -59,24 +93,19 @@ public class Enemy : MonoBehaviour
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
-        // Flip sprite to face player
         if (direction.x > 0) transform.localScale = new Vector3(2, 2, 2);
         else if (direction.x < 0) transform.localScale = new Vector3(-2, 2, 2);
     }
 
     void AttackPlayer()
     {
-        // Stop moving to attack
         rb.linearVelocity = Vector2.zero;
         if (animator != null) animator.SetBool("IsMoving", false);
 
-        // Check cooldown
         if (Time.time >= nextAttackTime)
         {
-            if (animator != null) animator.SetTrigger("attack"); // Make sure your trigger name matches!
-
+            if (animator != null) animator.SetTrigger("attack");
             nextAttackTime = Time.time + attackRate;
-            Debug.Log("Enemy hit the player!");
         }
     }
 
@@ -89,9 +118,7 @@ public class Enemy : MonoBehaviour
     void FindPlayerIfNeeded()
     {
         if (player != null) return;
-
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null)
-            player = playerObj.transform;
+        if (playerObj != null) player = playerObj.transform;
     }
 }

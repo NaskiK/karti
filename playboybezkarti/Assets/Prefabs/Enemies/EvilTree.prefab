@@ -129,8 +129,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d74050803f1cfc4696035ad48ffbd3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy
+  maxHealth: 50
+  deathEffect: {fileID: 4302384401020223292, guid: 5c67f7e8bc746404ebbc7c7d41a61dec, type: 3}
   speed: 2
   detectionRange: 5
+  attackRange: 1.2
+  attackRate: 1.5
 --- !u!50 &-7963692294030615399
 Rigidbody2D:
   serializedVersion: 5
