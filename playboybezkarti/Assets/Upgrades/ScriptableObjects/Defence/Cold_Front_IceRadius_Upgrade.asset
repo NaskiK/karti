@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e2b03e876d84d5b44bdc0b9a9b200ce8, type: 3}
-  m_Name: Predator_DamageIncrease_Upgrade
-  m_EditorClassIdentifier: Assembly-CSharp::DamageUpgrade
-  upgradeName: Predator
-  description: FireBall Damage +3
+  m_Script: {fileID: 11500000, guid: 35d789b2b0b6b26438eafc2109f3a4ee, type: 3}
+  m_Name: Cold_Front_IceRadius_Upgrade
+  m_EditorClassIdentifier: Assembly-CSharp::IceRadiusUpgrade
+  upgradeName: Cold Front
+  description: Ice Field Radius +0.2
   icon: {fileID: 0}
-  type: 0
+  type: 1
   rarity: 1
-  amount: 3
+  amount: 0.2
