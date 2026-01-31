@@ -15,7 +15,6 @@ public class DamageUpgrade : Upgrade
         }
 
         stats.damage += amount;
-        Debug.Log($"Applied Damage upgrade: +{amount} damage");
         Debug.Log($"Current Damage: {stats.damage} damage");
     }
 }

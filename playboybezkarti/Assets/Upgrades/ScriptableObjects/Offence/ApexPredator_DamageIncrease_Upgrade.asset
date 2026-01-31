@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: ApexPredator_DamageIncrease_Upgrade
   m_EditorClassIdentifier: Assembly-CSharp::DamageUpgrade
   upgradeName: Apex Predator
-  description: Damage +10
+  description: Damage +7
   icon: {fileID: 0}
   type: 0
   rarity: 7
-  amount: 10
+  amount: 7

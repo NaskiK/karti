@@ -21,7 +21,6 @@ public class UpgradeManager : MonoBehaviour
             Destroy(gameObject);
 
         GameObject gameobject = new GameObject();
-        OpenUpgradeSelection(player);
     }
 
 
@@ -59,10 +58,7 @@ public class UpgradeManager : MonoBehaviour
     {
         upgrade.Apply(player);
 
-        offenceButton.Setup(GetRandomUpgrade(UpgradeType.Offence));
-        defenceButton.Setup(GetRandomUpgrade(UpgradeType.Defence));
-
-        //upgradePanel.SetActive(false);
+        upgradePanel.SetActive(false);
         Time.timeScale = 1f;
     }
 }
