@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Chilling_Aura_IceSlow_Upgrade
   m_EditorClassIdentifier: Assembly-CSharp::IceSlowUpgrade
   upgradeName: Chilling Aura
-  description: Ice Field Slow +25%
+  description: Ice Field Slow +20%
   icon: {fileID: 0}
   type: 1
   rarity: 7
-  amount: 0.25
+  amount: 0.2
