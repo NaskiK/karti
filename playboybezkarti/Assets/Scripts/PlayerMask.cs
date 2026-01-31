@@ -1,9 +1,15 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public enum MaskType { None, Fire, Ice }
 
 public class PlayerMask : MonoBehaviour
 {
+    [Header("Fireball Ability")]
+    public GameObject fireballPrefab;     // Drag your Fireball prefab here
+    public float fireballCooldown = 0.3f; // Time between shots
+    private float fireballTimer = 0f;
+
     [Header("Fire Mask Sprites")]
     public Sprite fireIdleFront;
     public Sprite fireIdleBack;
@@ -27,7 +33,7 @@ public class PlayerMask : MonoBehaviour
         if (maskChild != null)
             maskRenderer = maskChild.GetComponent<SpriteRenderer>();
         else
-            Debug.LogError("Mask child not found on Player!");
+            Debug.LogError("Mask child not found on Player! Create a child named 'Mask' with a SpriteRenderer.");
 
         // Get PlayerMovement reference
         movement = GetComponent<PlayerMovement>();
@@ -38,29 +44,56 @@ public class PlayerMask : MonoBehaviour
     void Update()
     {
         UpdateMaskVisual();
-        TestMaskSwitch(); // temporary keys for testing
+
+        if (currentMask == MaskType.Fire)
+            HandleFireball();
+
+        TestMaskSwitch(); // temporary keys for testing mask switching
     }
 
+    // ===================== FIREBALL LOGIC =====================
+    void HandleFireball()
+    {
+        fireballTimer -= Time.deltaTime;
+
+        if (Mouse.current.leftButton.isPressed && fireballTimer <= 0f)
+        {
+            ShootFireball();
+            fireballTimer = fireballCooldown;
+        }
+    }
+
+    void ShootFireball()
+    {
+        if (fireballPrefab == null) return;
+
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        mousePos.z = 0;
+        Vector3 dir = mousePos - transform.position;
+
+        GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
+        fb.GetComponent<Fireball>().Initialize(dir); // No damage passed
+    }
+
+
+    // ===================== MASK VISUAL =====================
     void UpdateMaskVisual()
     {
         if (maskRenderer == null || movement == null) return;
 
         Vector2 lastDir = movement.lastMoveDir;
 
-        // Determine mask sprite and flip
         if (currentMask == MaskType.Fire)
         {
             if (Mathf.Abs(lastDir.y) > Mathf.Abs(lastDir.x))
             {
-                // Moving up/down → front/back
                 maskRenderer.sprite = lastDir.y > 0 ? fireIdleBack : fireIdleFront;
                 maskRenderer.flipX = false;
             }
             else
             {
-                // Moving left/right → side
                 maskRenderer.sprite = fireIdleSide;
-                maskRenderer.flipX = lastDir.x < 0; // flip left
+                maskRenderer.flipX = lastDir.x < 0;
             }
         }
         else if (currentMask == MaskType.Ice)
@@ -82,18 +115,18 @@ public class PlayerMask : MonoBehaviour
         }
     }
 
-
+    // ===================== TEST KEYS =====================
     void TestMaskSwitch()
     {
-        // Temporary keys for testing mask switching
-        if (UnityEngine.InputSystem.Keyboard.current.digit1Key.wasPressedThisFrame)
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
             EquipMask(MaskType.Fire);
-        if (UnityEngine.InputSystem.Keyboard.current.digit2Key.wasPressedThisFrame)
+        if (Keyboard.current.digit2Key.wasPressedThisFrame)
             EquipMask(MaskType.Ice);
-        if (UnityEngine.InputSystem.Keyboard.current.digit0Key.wasPressedThisFrame)
+        if (Keyboard.current.digit0Key.wasPressedThisFrame)
             EquipMask(MaskType.None);
     }
 
+    // ===================== EQUIP MASK =====================
     public void EquipMask(MaskType mask)
     {
         currentMask = mask;
