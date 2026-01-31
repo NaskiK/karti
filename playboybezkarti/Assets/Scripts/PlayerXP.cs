@@ -22,7 +22,7 @@ public class PlayerXP : MonoBehaviour
     {
         level++;
         currentXP -= xpToNextLevel;
-        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.3f);
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.2f);
 
         Debug.Log($"LEVEL UP → Level {level}");
 

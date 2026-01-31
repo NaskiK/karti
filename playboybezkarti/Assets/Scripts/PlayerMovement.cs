@@ -3,17 +3,32 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    [Header("Movement")]
     public float moveSpeed = 5f;
 
+    [Header("Idle Sprites")]
     public Sprite idleFront;
     public Sprite idleBack;
     public Sprite idleSide;
 
+    [Header("Walking Sprites")]
+    public Sprite[] walkFront;
+    public Sprite[] walkBack;
+    public Sprite[] walkSide;
+
+    [Header("Animation Settings")]
+    public float walkFrameRate = 0.1f; // Time per frame
+
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
-    private Vector2 moveInput;
+    // private Vector2 moveInput;
+    [HideInInspector] public Vector2 moveInput;
+
     [HideInInspector] public Vector2 lastMoveDir = Vector2.down;
+
+    private float walkTimer;
+    private int walkFrameIndex;
 
     void Awake()
     {
@@ -49,16 +64,45 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateSpriteDirection()
     {
-        // Decide direction based on last movement (works for moving AND idle)
+        bool isMoving = moveInput != Vector2.zero;
+
+        // Determine direction
         if (Mathf.Abs(lastMoveDir.y) > Mathf.Abs(lastMoveDir.x))
         {
-            sr.sprite = lastMoveDir.y > 0 ? idleBack : idleFront;
-            sr.flipX = false;
+            // Up/Down
+            if (lastMoveDir.y > 0)
+                SetWalkingOrIdle(walkBack, idleBack, isMoving, false);
+            else
+                SetWalkingOrIdle(walkFront, idleFront, isMoving, false);
         }
         else
         {
-            sr.sprite = idleSide;
-            sr.flipX = lastMoveDir.x < 0;
+            // Side
+            SetWalkingOrIdle(walkSide, idleSide, isMoving, lastMoveDir.x < 0);
         }
+    }
+
+    void SetWalkingOrIdle(Sprite[] walkSprites, Sprite idleSprite, bool isMoving, bool flipX)
+    {
+        if (isMoving && walkSprites.Length > 0)
+        {
+            // Animate walking
+            walkTimer += Time.deltaTime;
+            if (walkTimer >= walkFrameRate)
+            {
+                walkFrameIndex = (walkFrameIndex + 1) % walkSprites.Length;
+                walkTimer = 0f;
+            }
+            sr.sprite = walkSprites[walkFrameIndex];
+        }
+        else
+        {
+            // Idle
+            sr.sprite = idleSprite;
+            walkFrameIndex = 0;
+            walkTimer = 0f;
+        }
+
+        sr.flipX = flipX;
     }
 }
