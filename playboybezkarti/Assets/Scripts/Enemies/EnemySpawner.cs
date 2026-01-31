@@ -1,50 +1,78 @@
 using UnityEngine;
-using System.Collections; // Required for Coroutines
+using System.Collections;
 
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
-    public GameObject spawnEffectPrefab; // Drag Spawn_FX here
-    public float spawnInterval = 3f;
-    public float spawnRadius = 12f;
-    public float spawnDelay = 0.2f; // Short delay for the effect to play
+    public GameObject spawnEffectPrefab;
+
+    [Header("Spawn Timing")]
+    public float spawnInterval = 1.5f;
+    public float spawnDelay = 0.3f;
 
     private float timer;
-    private Transform playerTransform;
+    private bool isPlayerInside = false;
 
     void Update()
     {
-        if (playerTransform == null)
+        // Only run the timer and spawn if the player is currently in the zone
+        if (isPlayerInside)
         {
-            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null) playerTransform = playerObj.transform;
-            return;
-        }
+            timer += Time.deltaTime;
 
-        timer += Time.deltaTime;
-        if (timer >= spawnInterval)
+            if (timer >= spawnInterval)
+            {
+                StartCoroutine(SpawnRoutine());
+                timer = 0f;
+            }
+        }
+        else
         {
-            StartCoroutine(SpawnRoutine());
+            // Optional: Reset timer when player leaves so they don't get 
+            // an instant spawn the moment they step back in.
             timer = 0f;
         }
     }
 
     IEnumerator SpawnRoutine()
     {
-        // 1. Calculate Position
-        Vector2 randomDirection = Random.insideUnitCircle.normalized;
-        Vector3 spawnPosition = playerTransform.position + (Vector3)(randomDirection * spawnRadius);
+        float randomX = Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
+        float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
 
-        // 2. Play Spawn Effect
+        Vector3 spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
+
         if (spawnEffectPrefab != null)
         {
             Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
         }
 
-        // 3. Wait slightly (so the flash happens before the enemy pops in)
         yield return new WaitForSeconds(spawnDelay);
-
-        // 4. Spawn Enemy
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+    }
+
+    // --- TRIGGER DETECTION ---
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = true;
+            Debug.Log("Player entered the Cursed Woods! Spawning started.");
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            isPlayerInside = false;
+            Debug.Log("Player left the zone. Spawning stopped.");
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = isPlayerInside ? Color.red : Color.green; // Red when active!
+        Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
 }

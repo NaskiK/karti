@@ -12,9 +12,9 @@ public class Enemy : MonoBehaviour
     public float detectionRange = 5f;
 
     [Header("Combat Settings")]
-    public float attackRange = 1.2f;
+    public float attackRange = 2.5f; // Increased for your 3x3 scale
     public float attackRate = 1.5f;
-    public int contactDamage = 10; // How much damage it deals to player
+    public int contactDamage = 10;
     private float nextAttackTime = 0f;
 
     private Transform player;
@@ -25,8 +25,6 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
-
-        // Initialize HP
         currentHealth = maxHealth;
 
         if (animator != null) animator.SetBool("IsMoving", false);
@@ -58,16 +56,13 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // --- HEALTH LOGIC ---
-    // Note: I made this 'int' to match your fireball script
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
-        currentHealth = Mathf.Max(currentHealth, 0); // Prevents HP going below 0
+        currentHealth = Mathf.Max(currentHealth, 0);
 
         Debug.Log($"{gameObject.name} took {damageAmount} damage. HP: {currentHealth}/{maxHealth}");
 
-        // Play "Hurt" animation trigger
         if (animator != null) animator.SetTrigger("Hurt");
 
         if (currentHealth <= 0)
@@ -78,17 +73,13 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        Debug.Log($"{gameObject.name} has been defeated!");
-
         if (deathEffect != null)
         {
             Instantiate(deathEffect, transform.position, Quaternion.identity);
         }
-
         Destroy(gameObject);
     }
 
-    // --- MOVEMENT & COMBAT ---
     void MoveToPlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
@@ -96,9 +87,8 @@ public class Enemy : MonoBehaviour
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
-        // Scaling 2, 2, 2 based on your previous edit
-        if (direction.x > 0) transform.localScale = new Vector3(2, 2, 2);
-        else if (direction.x < 0) transform.localScale = new Vector3(-2, 2, 2);
+        if (direction.x > 0) transform.localScale = new Vector3(3, 3, 2);
+        else if (direction.x < 0) transform.localScale = new Vector3(-3, 3, 2);
     }
 
     void AttackPlayer()
@@ -108,7 +98,6 @@ public class Enemy : MonoBehaviour
 
         if (Time.time >= nextAttackTime)
         {
-            // Matches your trigger name "attack"
             if (animator != null) animator.SetTrigger("attack");
             nextAttackTime = Time.time + attackRate;
         }
@@ -125,5 +114,25 @@ public class Enemy : MonoBehaviour
         if (player != null) return;
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null) player = playerObj.transform;
+    }
+
+    // --- DAMAGE LOGIC MOVED TO ANIMATION EVENT ONLY ---
+
+    public void DealDamageAtSwing()
+    {
+        if (player == null) return;
+
+        float distance = Vector2.Distance(transform.position, player.position);
+
+        // We check a slightly larger area for the swing to make it fair
+        if (distance <= attackRange + 0.5f)
+        {
+            PlayerStats stats = player.GetComponent<PlayerStats>();
+            if (stats != null)
+            {
+                stats.TakeDamage(contactDamage);
+                Debug.Log("Tree swing connected!");
+            }
+        }
     }
 }
