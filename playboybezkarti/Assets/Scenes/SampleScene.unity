@@ -200,6 +200,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 677185312}
     m_Modifications:
+    - target: {fileID: 712895704815007132, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 712895704815007132, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471248703233133174, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 400
+      objectReference: {fileID: 0}
+    - target: {fileID: 2471248703233133174, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 400
+      objectReference: {fileID: 0}
     - target: {fileID: 7856315809554274578, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
       propertyPath: m_Name
       value: UpgradePanel
@@ -274,7 +290,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7987243986190450917, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -133
       objectReference: {fileID: 0}
     - target: {fileID: 7987243986190450917, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -1135,7 +1151,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 301.5, y: -38}
+  m_AnchoredPosition: {x: 301.5, y: -171}
   m_SizeDelta: {x: 600, y: 75}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &821191371
