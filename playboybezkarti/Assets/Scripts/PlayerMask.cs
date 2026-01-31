@@ -6,11 +6,9 @@ public enum MaskType { None, Fire, Ice }
 
 public class PlayerMask : MonoBehaviour
 {
-    [Header("Ice AOE Visual")]
-    [SerializeField] private Transform iceAOEVisual;
-
     [Header("Fireball Ability")]
     public GameObject fireballPrefab;
+    public float fireballCooldown = 0.3f;
     private float fireballTimer;
 
     [Header("Fire Mask Sprites")]
@@ -23,7 +21,6 @@ public class PlayerMask : MonoBehaviour
     public Sprite iceIdleBack;
     public Sprite iceIdleSide;
 
-    [HideInInspector]
     public MaskType currentMask = MaskType.None;
 
     private SpriteRenderer maskRenderer;
@@ -34,12 +31,6 @@ public class PlayerMask : MonoBehaviour
     private float iceTickTimer;
     private HashSet<GameObject> enemiesInIce = new HashSet<GameObject>();
 
-    // ===== WIGGLE SETTINGS =====
-    private Vector3 maskOriginalLocalPos;
-    private float wiggleTimer = 0f;
-    private float wiggleFrequency = 0.1f; // 0.1 seconds per toggle
-    private float wiggleAmount = 0.01f;   // 1 pixel in Unity units
-
     void Awake()
     {
         movement = GetComponent<PlayerMovement>();
@@ -49,14 +40,9 @@ public class PlayerMask : MonoBehaviour
         Transform maskChild = transform.Find("Mask");
         if (maskChild != null)
             maskRenderer = maskChild.GetComponent<SpriteRenderer>();
-        else
-            Debug.LogError("Player Mask child not found!");
 
         if (iceCollider != null)
             iceCollider.isTrigger = true;
-
-        if (maskRenderer != null)
-            maskOriginalLocalPos = maskRenderer.transform.localPosition;
     }
 
     void Update()
@@ -69,71 +55,41 @@ public class PlayerMask : MonoBehaviour
         if (currentMask == MaskType.Ice)
             HandleIceAOE();
 
-        HandleMaskWiggle();
-
         TestMaskSwitch();
-        UpdateIceAOEVisual();
-
-    }
-    void UpdateIceAOEVisual()
-    {
-        if (iceAOEVisual == null || stats == null) return;
-
-        bool active = currentMask == MaskType.Ice;
-        iceAOEVisual.gameObject.SetActive(active);
-
-        if (!active) return;
-
-        float diameter = stats.iceAOERadius * 2f;
-        iceAOEVisual.localScale = new Vector3(diameter, diameter, 1f);
     }
 
-
-    // ================= FIREBALL =================
+    // ================= FIRE =================
     void HandleFireball()
     {
         fireballTimer -= Time.deltaTime;
 
         if (Mouse.current.leftButton.isPressed && fireballTimer <= 0f)
         {
-            if (fireballPrefab == null) return;
-
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             mousePos.z = 0;
-            Vector3 dir = mousePos - transform.position;
 
+            Vector3 dir = mousePos - transform.position;
             GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
             fb.GetComponent<Fireball>().Initialize(dir);
 
-            // Use cooldown from PlayerStats
-            fireballTimer = stats.fireballCooldown;
+            fireballTimer = fireballCooldown;
         }
     }
 
     // ================= ICE =================
     void HandleIceAOE()
     {
-        if (iceCollider == null || stats == null) return;
+        if (iceCollider == null) return;
 
         iceCollider.radius = stats.iceAOERadius;
 
         iceTickTimer -= Time.deltaTime;
         if (iceTickTimer <= 0f)
         {
-            // 🔥 ITERATE OVER A COPY
-            foreach (GameObject enemy in new List<GameObject>(enemiesInIce))
+            foreach (GameObject enemy in enemiesInIce)
             {
-                if (enemy == null)
-                {
-                    enemiesInIce.Remove(enemy);
-                    continue;
-                }
-
-                enemy.SendMessage(
-                    "TakeDamage",
-                    (int)stats.iceDamagePerSecond,
-                    SendMessageOptions.DontRequireReceiver
-                );
+                if (enemy == null) continue;
+                enemy.SendMessage("TakeDamage", (int)stats.iceDamagePerSecond, SendMessageOptions.DontRequireReceiver);
             }
 
             iceTickTimer = 1f;
@@ -183,37 +139,6 @@ public class PlayerMask : MonoBehaviour
         {
             maskRenderer.sprite = side;
             maskRenderer.flipX = dir.x < 0;
-        }
-    }
-
-    // ================= MASK WIGGLE =================
-    void HandleMaskWiggle()
-    {
-        if (maskRenderer == null || movement == null) return;
-
-        Vector2 dir = movement.lastMoveDir;
-        Vector2 moveInput = movement.moveInput; // now public in PlayerMovement
-
-        // Only wiggle if mask is visible
-        if (moveInput != Vector2.zero &&
-            !(Mathf.Abs(dir.y) > Mathf.Abs(dir.x) && dir.y > 0)) // not walking up/back
-        {
-            wiggleTimer -= Time.deltaTime;
-            if (wiggleTimer <= 0f)
-            {
-                // toggle mask Y position up/down by 1 pixel
-                Vector3 pos = maskRenderer.transform.localPosition;
-                pos.y = maskOriginalLocalPos.y + (pos.y == maskOriginalLocalPos.y ? wiggleAmount : 0f);
-                maskRenderer.transform.localPosition = pos;
-
-                wiggleTimer = wiggleFrequency;
-            }
-        }
-        else
-        {
-            // reset
-            maskRenderer.transform.localPosition = maskOriginalLocalPos;
-            wiggleTimer = 0f;
         }
     }
 

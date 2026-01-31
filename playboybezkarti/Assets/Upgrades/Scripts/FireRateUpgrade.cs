@@ -9,6 +9,11 @@ public class FireRateUpgrade : Upgrade
     public override void Apply(GameObject player)
     {
         PlayerStats stats = player.GetComponent<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats component not found on player!");
+            return;
+        }
 
         // Reduce cooldown but clamp to a minimum to avoid zero or negative cooldown
         stats.fireballCooldown = Mathf.Max(0.05f, stats.fireballCooldown - cooldownReduction);

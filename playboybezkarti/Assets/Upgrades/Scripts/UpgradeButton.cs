@@ -21,6 +21,4 @@ public class UpgradeButton : MonoBehaviour
     {
         UpgradeManager.Instance.ChooseUpgrade(upgrade);
     }
-
-    
 }
