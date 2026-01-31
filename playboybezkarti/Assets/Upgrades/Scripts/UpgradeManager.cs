@@ -59,10 +59,7 @@ public class UpgradeManager : MonoBehaviour
     {
         upgrade.Apply(player);
 
-        offenceButton.Setup(GetRandomUpgrade(UpgradeType.Offence));
-        defenceButton.Setup(GetRandomUpgrade(UpgradeType.Defence));
-
-        //upgradePanel.SetActive(false);
+        upgradePanel.SetActive(false);
         Time.timeScale = 1f;
     }
 }
