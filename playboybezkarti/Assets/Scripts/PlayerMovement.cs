@@ -13,7 +13,7 @@ public class PlayerMovement : MonoBehaviour
     private SpriteRenderer sr;
 
     private Vector2 moveInput;
-    private Vector2 lastMoveDir = Vector2.down;
+    [HideInInspector] public Vector2 lastMoveDir = Vector2.down;
 
     void Awake()
     {
