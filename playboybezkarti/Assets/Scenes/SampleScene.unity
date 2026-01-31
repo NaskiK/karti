@@ -512,6 +512,10 @@ MonoBehaviour:
   spawnEffectPrefab: {fileID: 1273915125232972, guid: 73767e07adddc394d82b994801f89bbb, type: 3}
   spawnInterval: 1.9
   spawnDelay: 0.2
+  forbiddenLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  checkRadius: 0.5
 --- !u!4 &555012554
 Transform:
   m_ObjectHideFlags: 0
@@ -15545,7 +15549,7 @@ GameObject:
   - component: {fileID: 1368192057}
   - component: {fileID: 1368192061}
   - component: {fileID: 1368192060}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Items
   m_TagString: Untagged
   m_Icon: {fileID: 0}
