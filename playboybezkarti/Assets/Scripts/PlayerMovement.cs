@@ -1,28 +1,33 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 5f;
-    public Rigidbody2D rb;
-    public Animator anim;
+    [SerializeField] private float moveSpeed = 5f;
 
-    Vector2 move;
+    private Rigidbody2D rb;
+    private Vector2 moveInput;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+    }
 
     void Update()
     {
-        // Input
-        move.x = Input.GetAxisRaw("Horizontal");
-        move.y = Input.GetAxisRaw("Vertical");
+        moveInput = Vector2.zero;
 
-        // Animation
-        anim.SetFloat("MoveX", move.x);
-        anim.SetFloat("MoveY", move.y);
-        anim.SetBool("IsMoving", move != Vector2.zero);
+        if (Keyboard.current.wKey.isPressed) moveInput.y += 1;
+        if (Keyboard.current.sKey.isPressed) moveInput.y -= 1;
+        if (Keyboard.current.aKey.isPressed) moveInput.x -= 1;
+        if (Keyboard.current.dKey.isPressed) moveInput.x += 1;
+
+        if (moveInput.sqrMagnitude > 1f)
+            moveInput.Normalize();
     }
 
     void FixedUpdate()
     {
-        // Move the player
-        rb.MovePosition(rb.position + move.normalized * moveSpeed * Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + moveInput * moveSpeed * Time.fixedDeltaTime);
     }
 }
