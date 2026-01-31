@@ -15,8 +15,9 @@ public class MaxHpUpgrade : Upgrade
         }
 
         stats.maxHP += amount;
-        stats.currentHP += amount; // heal the player by the same amount
-        Debug.Log($"Applied MaxHP upgrade: +{amount} HP");
-        Debug.Log($"Max HP: +{stats.currentHP} HP");
+        stats.currentHP += amount*2; // heal the player by the same amount
+        if (stats.currentHP > stats.maxHP) stats.currentHP = stats.maxHP;
+        Debug.Log($"Current HP: {stats.currentHP} HP");
+        Debug.Log($"Max HP: {stats.maxHP} HP");
     }
 }

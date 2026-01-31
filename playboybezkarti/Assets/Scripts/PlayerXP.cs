@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerProgress : MonoBehaviour
+public class PlayerXP : MonoBehaviour
 {
     public int level = 1;
 

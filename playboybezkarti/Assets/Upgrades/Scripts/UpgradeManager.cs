@@ -21,7 +21,6 @@ public class UpgradeManager : MonoBehaviour
             Destroy(gameObject);
 
         GameObject gameobject = new GameObject();
-        OpenUpgradeSelection(player);
     }
 
 

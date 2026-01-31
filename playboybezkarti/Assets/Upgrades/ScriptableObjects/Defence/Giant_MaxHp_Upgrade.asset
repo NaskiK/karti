@@ -13,7 +13,10 @@ MonoBehaviour:
   m_Name: Giant_MaxHp_Upgrade
   m_EditorClassIdentifier: Assembly-CSharp::MaxHpUpgrade
   upgradeName: Giant
-  description: Max HP +10
+  description: 'Max HP +10
+
+    Current HP + 20'
   icon: {fileID: 0}
   type: 1
+  rarity: 1
   amount: 10
