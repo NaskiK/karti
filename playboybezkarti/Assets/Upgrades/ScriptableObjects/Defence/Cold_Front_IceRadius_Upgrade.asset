@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Cold_Front_IceRadius_Upgrade
   m_EditorClassIdentifier: Assembly-CSharp::IceRadiusUpgrade
   upgradeName: Cold Front
-  description: Ice Field Radius +0.3
+  description: Ice Field Radius +0.2
   icon: {fileID: 0}
   type: 1
   rarity: 1
-  amount: 0.3
+  amount: 0.2

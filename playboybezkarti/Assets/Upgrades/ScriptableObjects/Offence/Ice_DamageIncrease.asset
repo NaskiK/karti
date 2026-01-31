@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Ice_DamageIncrease
   m_EditorClassIdentifier: Assembly-CSharp::IceDamageUpgrade
   upgradeName: Ice
-  description: Ice Field Damage +3
+  description: Ice Field Damage +4
   icon: {fileID: 0}
   type: 0
   rarity: 1
-  amount: 3
+  amount: 4

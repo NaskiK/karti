@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Ice_King_DamageIncrease 1
   m_EditorClassIdentifier: Assembly-CSharp::IceDamageUpgrade
   upgradeName: Ice King
-  description: Ice Field Damage +7
+  description: Ice Field Damage +8
   icon: {fileID: 0}
   type: 0
   rarity: 7
-  amount: 7
+  amount: 8

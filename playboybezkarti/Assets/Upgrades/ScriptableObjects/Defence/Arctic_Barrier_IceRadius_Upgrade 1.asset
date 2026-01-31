@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Arctic_Barrier_IceRadius_Upgrade 1
   m_EditorClassIdentifier: Assembly-CSharp::IceRadiusUpgrade
   upgradeName: Arctic Barrier
-  description: Ice Field Radius +0.8
+  description: Ice Field Radius +0.5
   icon: {fileID: 0}
   type: 1
   rarity: 1
-  amount: 0.8
+  amount: 0.5
