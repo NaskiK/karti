@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: Ultra_Giant_DefenceUpgrade
   m_EditorClassIdentifier: Assembly-CSharp::MaxHpUpgrade
   upgradeName: Ultra Giant
-  description: Max HP +20
+  description: 'Max HP +20
+
+    Current HP +40'
   icon: {fileID: 0}
   type: 1
   rarity: 7

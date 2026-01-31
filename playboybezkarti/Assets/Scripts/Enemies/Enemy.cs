@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
+    [Header("XP Settings")]
+    public int xpOnDeath = 25;
+
     [Header("Health Settings")]
     public int maxHealth = 50;
     private int currentHealth;
@@ -77,6 +80,7 @@ public class Enemy : MonoBehaviour
         {
             Instantiate(deathEffect, transform.position, Quaternion.identity);
         }
+        GiveXP();
         Destroy(gameObject);
     }
 
@@ -134,5 +138,12 @@ public class Enemy : MonoBehaviour
                 Debug.Log("Tree swing connected!");
             }
         }
+    }
+
+    void GiveXP()
+    {
+        PlayerXP playerXP = FindObjectOfType<PlayerXP>();
+        if (playerXP != null)
+            playerXP.AddXP(xpOnDeath);
     }
 }
