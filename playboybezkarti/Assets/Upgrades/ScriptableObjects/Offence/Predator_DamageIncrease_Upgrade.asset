@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Predator_DamageIncrease_Upgrade
   m_EditorClassIdentifier: Assembly-CSharp::DamageUpgrade
   upgradeName: Predator
-  description: Damage +5
+  description: Damage +3
   icon: {fileID: 0}
   type: 0
-  amount: 5
+  rarity: 1
+  amount: 3
