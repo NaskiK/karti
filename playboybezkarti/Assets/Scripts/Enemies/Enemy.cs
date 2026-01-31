@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
     public int contactDamage = 10;
     private float nextAttackTime = 0f;
 
-    private Transform player;
+    private Transform currentTarget; // This could be Player or NPC
     private Rigidbody2D rb;
     private Animator animator;
 
@@ -35,50 +35,68 @@ public class Enemy : MonoBehaviour
         animator = GetComponent<Animator>();
 
         // --- DIFFICULTY SCALING ---
-        // We look at the DifficultyManager to boost stats before setting base variables
         if (DifficultyManager.instance != null)
         {
             float multiplier = DifficultyManager.instance.GetDifficultyMultiplier();
-
             maxHealth = Mathf.RoundToInt(maxHealth * multiplier);
             speed = speed * multiplier;
             contactDamage = Mathf.RoundToInt(contactDamage * multiplier);
-
-            // Optionally scale XP so harder enemies give more reward
             xpOnDeath = Mathf.RoundToInt(xpOnDeath * multiplier);
-
-            Debug.Log($"{gameObject.name} spawned at Level {multiplier:F1}");
         }
 
         currentHealth = maxHealth;
-        baseSpeed = speed; // Set baseSpeed AFTER scaling so slow effects work correctly
+        baseSpeed = speed;
 
         if (animator != null) animator.SetBool("IsMoving", false);
     }
 
     void Update()
     {
-        FindPlayerIfNeeded();
+        FindClosestTarget();
 
-        if (player == null)
+        if (currentTarget == null)
         {
             StopMoving();
             return;
         }
 
-        float distance = Vector2.Distance(transform.position, player.position);
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
 
         if (distance <= attackRange)
         {
-            AttackPlayer();
+            AttackTarget();
         }
         else if (distance <= detectionRange)
         {
-            MoveToPlayer();
+            MoveToTarget();
         }
         else
         {
             StopMoving();
+        }
+    }
+
+    // ===== TARGETING LOGIC =====
+    void FindClosestTarget()
+    {
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        GameObject npcObj = GameObject.FindGameObjectWithTag("NPC");
+
+        float distToPlayer = playerObj != null ? Vector2.Distance(transform.position, playerObj.transform.position) : float.MaxValue;
+        float distToNPC = npcObj != null ? Vector2.Distance(transform.position, npcObj.transform.position) : float.MaxValue;
+
+        // Choose the closest one
+        if (distToNPC < distToPlayer)
+        {
+            currentTarget = npcObj.transform;
+        }
+        else if (playerObj != null)
+        {
+            currentTarget = playerObj.transform;
+        }
+        else
+        {
+            currentTarget = null;
         }
     }
 
@@ -104,19 +122,19 @@ public class Enemy : MonoBehaviour
     }
 
     // ===== MOVEMENT =====
-    void MoveToPlayer()
+    void MoveToTarget()
     {
-        Vector2 direction = (player.position - transform.position).normalized;
+        Vector2 direction = ((Vector2)currentTarget.position - (Vector2)transform.position).normalized;
         rb.linearVelocity = direction * speed;
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
-        // Flip sprite (Set to 5 based on your last preference)
+        // Flip sprite based on direction
         if (direction.x > 0) transform.localScale = new Vector3(5, 5, 2);
         else if (direction.x < 0) transform.localScale = new Vector3(-5, 5, 2);
     }
 
-    void AttackPlayer()
+    void AttackTarget()
     {
         rb.linearVelocity = Vector2.zero;
         if (animator != null) animator.SetBool("IsMoving", false);
@@ -134,33 +152,36 @@ public class Enemy : MonoBehaviour
         if (animator != null) animator.SetBool("IsMoving", false);
     }
 
-    void FindPlayerIfNeeded()
-    {
-        if (player != null) return;
-        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null) player = playerObj.transform;
-    }
-
     // ===== DAMAGE FROM ANIMATION EVENT =====
     public void DealDamageAtSwing()
     {
-        if (player == null) return;
+        if (currentTarget == null) return;
 
-        float distance = Vector2.Distance(transform.position, player.position);
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
 
-        if (distance <= attackRange + 0.5f)
+        // If in range, try to damage Player OR NPC
+        if (distance <= attackRange + 0.8f)
         {
-            PlayerStats stats = player.GetComponent<PlayerStats>();
-            if (stats != null)
+            // Try hitting player
+            PlayerStats pStats = currentTarget.GetComponent<PlayerStats>();
+            if (pStats != null)
             {
-                stats.TakeDamage(contactDamage);
+                pStats.TakeDamage(contactDamage);
+                return;
+            }
+
+            // Try hitting NPC
+            NPCStats nStats = currentTarget.GetComponent<NPCStats>();
+            if (nStats != null)
+            {
+                nStats.TakeDamage(contactDamage);
             }
         }
     }
 
     void GiveXP()
     {
-        PlayerXP playerXP = FindObjectOfType<PlayerXP>();
+        PlayerXP playerXP = Object.FindFirstObjectByType<PlayerXP>();
         if (playerXP != null)
             playerXP.AddXP(xpOnDeath);
     }
