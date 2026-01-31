@@ -8,7 +8,6 @@ public class PlayerMask : MonoBehaviour
 {
     [Header("Fireball Ability")]
     public GameObject fireballPrefab;
-    public float fireballCooldown = 0.3f;
     private float fireballTimer;
 
     [Header("Fire Mask Sprites")]
@@ -21,6 +20,7 @@ public class PlayerMask : MonoBehaviour
     public Sprite iceIdleBack;
     public Sprite iceIdleSide;
 
+    [HideInInspector]
     public MaskType currentMask = MaskType.None;
 
     private SpriteRenderer maskRenderer;
@@ -40,6 +40,8 @@ public class PlayerMask : MonoBehaviour
         Transform maskChild = transform.Find("Mask");
         if (maskChild != null)
             maskRenderer = maskChild.GetComponent<SpriteRenderer>();
+        else
+            Debug.LogError("Player Mask child not found!");
 
         if (iceCollider != null)
             iceCollider.isTrigger = true;
@@ -58,28 +60,31 @@ public class PlayerMask : MonoBehaviour
         TestMaskSwitch();
     }
 
-    // ================= FIRE =================
+    // ================= FIREBALL =================
     void HandleFireball()
     {
         fireballTimer -= Time.deltaTime;
 
         if (Mouse.current.leftButton.isPressed && fireballTimer <= 0f)
         {
+            if (fireballPrefab == null) return;
+
             Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             mousePos.z = 0;
-
             Vector3 dir = mousePos - transform.position;
+
             GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
             fb.GetComponent<Fireball>().Initialize(dir);
 
-            fireballTimer = fireballCooldown;
+            // Use cooldown from PlayerStats
+            fireballTimer = stats.fireballCooldown;
         }
     }
 
     // ================= ICE =================
     void HandleIceAOE()
     {
-        if (iceCollider == null) return;
+        if (iceCollider == null || stats == null) return;
 
         iceCollider.radius = stats.iceAOERadius;
 
@@ -89,10 +94,12 @@ public class PlayerMask : MonoBehaviour
             foreach (GameObject enemy in enemiesInIce)
             {
                 if (enemy == null) continue;
+
+                // Damage per second comes from PlayerStats
                 enemy.SendMessage("TakeDamage", (int)stats.iceDamagePerSecond, SendMessageOptions.DontRequireReceiver);
             }
 
-            iceTickTimer = 1f;
+            iceTickTimer = 1f; // Tick every 1 second
         }
     }
 
