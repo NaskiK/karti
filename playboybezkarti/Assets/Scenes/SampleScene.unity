@@ -1222,9 +1222,9 @@ MonoBehaviour:
   currentHP: 0
   damage: 10
   fireballCooldown: 0.3
-  iceAOERadius: 1.5
+  iceAOERadius: 0.5
   iceDamagePerSecond: 5
-  iceSlowPercent: 0.5
+  iceSlowPercent: 0.8
 --- !u!114 &759998084
 MonoBehaviour:
   m_ObjectHideFlags: 0
