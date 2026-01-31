@@ -902,6 +902,7 @@ GameObject:
   - component: {fileID: 759998083}
   - component: {fileID: 759998084}
   - component: {fileID: 759998085}
+  - component: {fileID: 759998086}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1081,6 +1082,9 @@ MonoBehaviour:
   currentHP: 0
   damage: 10
   fireballCooldown: 0.3
+  iceAOERadius: 1.5
+  iceDamagePerSecond: 5
+  iceSlowPercent: 0.5
 --- !u!114 &759998084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1094,6 +1098,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMask
   fireballPrefab: {fileID: 8580221665381270492, guid: 54d3cc6b5e481a04cb534def89a5deac, type: 3}
+  fireballCooldown: 0.3
   fireIdleFront: {fileID: 21300000, guid: 1729b194bff7334479d3be859b5a294d, type: 3}
   fireIdleBack: {fileID: 0}
   fireIdleSide: {fileID: 21300000, guid: d3753d0b09e349a42aa287aa225e7053, type: 3}
@@ -1116,6 +1121,42 @@ MonoBehaviour:
   level: 1
   currentXP: 0
   xpToNextLevel: 300
+--- !u!58 &759998086
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759998077}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_Radius: 0.16
 --- !u!1 &821191369
 GameObject:
   m_ObjectHideFlags: 0
