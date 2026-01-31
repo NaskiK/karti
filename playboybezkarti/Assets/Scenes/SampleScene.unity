@@ -206,7 +206,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7856315809554274578, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7987243986190450917, guid: f18c7736598ad954386f0ace1e25456a, type: 3}
       propertyPath: m_Pivot.x
@@ -1083,7 +1083,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProgress
   level: 1
   currentXP: 0
-  xpToNextLevel: 100
+  xpToNextLevel: 300
 --- !u!1 &821191369
 GameObject:
   m_ObjectHideFlags: 0
