@@ -10,9 +10,10 @@ public class EnemySpawner : MonoBehaviour
     public float spawnInterval = 1.5f;
     public float spawnDelay = 0.3f;
 
-    [Header("Exclusion Settings")]
-    public LayerMask forbiddenLayer; // Set this to "Forbidden" in Inspector
-    public float checkRadius = 0.5f; // How big of a 'safe gap' to check for
+    [Header("Exclusion Settings (Anti-Stuck)")]
+    public LayerMask forbiddenLayer; // Set this to "Forbidden"
+    [Tooltip("Increase this if enemies still spawn too close to forbidden objects")]
+    public float checkRadius = 1.2f;
 
     private float timer;
     private bool isPlayerInside = false;
@@ -39,16 +40,18 @@ public class EnemySpawner : MonoBehaviour
     {
         Vector3 spawnPosition = Vector3.zero;
         bool foundValidSpot = false;
-        int maxAttempts = 10; // Don't loop forever if area is full
+        int maxAttempts = 15; // Increased attempts to find a clean spot
         int currentAttempt = 0;
 
         while (!foundValidSpot && currentAttempt < maxAttempts)
         {
+            // Calculate a random spot within the spawner's box
             float randomX = Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
             float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
             spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
 
-            // Check if there is anything on the "Forbidden" layer at this spot
+            // Physics Check: Is there a "Forbidden" collider at this spot?
+            // We use OverlapCircle to check a radius around the point
             Collider2D hit = Physics2D.OverlapCircle(spawnPosition, checkRadius, forbiddenLayer);
 
             if (hit == null)
@@ -58,20 +61,24 @@ public class EnemySpawner : MonoBehaviour
             currentAttempt++;
         }
 
-        // Only spawn if we actually found a safe spot
         if (foundValidSpot)
         {
+            // 1. Show the warning/spawn effect
             if (spawnEffectPrefab != null)
             {
                 Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
             }
 
+            // 2. Wait for the delay
             yield return new WaitForSeconds(spawnDelay);
+
+            // 3. Spawn the actual enemy
             Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         }
         else
         {
-            Debug.LogWarning("Spawner could not find a valid spot (everything is blocked!)");
+            // If it fails 15 times, it just skips this spawn cycle to prevent lag
+            Debug.LogWarning("Spawner: No room found! Skipping spawn.");
         }
     }
 
@@ -81,7 +88,7 @@ public class EnemySpawner : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = true;
-            Debug.Log("Player entered the Cursed Woods! Spawning started.");
+            Debug.Log("Player entered spawn zone.");
         }
     }
 
@@ -90,10 +97,11 @@ public class EnemySpawner : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = false;
-            Debug.Log("Player left the zone. Spawning stopped.");
+            Debug.Log("Player left spawn zone.");
         }
     }
 
+    // This helps you see the check radius in the Scene View
     private void OnDrawGizmos()
     {
         Gizmos.color = isPlayerInside ? Color.red : Color.green;
