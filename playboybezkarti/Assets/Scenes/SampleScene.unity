@@ -549,6 +549,7 @@ GameObject:
   - component: {fileID: 759998080}
   - component: {fileID: 759998079}
   - component: {fileID: 759998078}
+  - component: {fileID: 759998083}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -710,6 +711,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &759998083
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759998077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f7fb156aada0cc42b36e4186b0efa06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  maxHP: 100
+  currentHP: 0
+  damage: 10
 --- !u!1 &821191369
 GameObject:
   m_ObjectHideFlags: 0
