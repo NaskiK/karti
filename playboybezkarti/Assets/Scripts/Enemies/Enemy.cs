@@ -3,22 +3,23 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [Header("Health Settings")]
-    public float maxHealth = 50f;
-    private float currentHealth;
-    public GameObject deathEffect; // Optional: Drag a particle effect here later
+    public int maxHealth = 50;
+    private int currentHealth;
+    public GameObject deathEffect;
 
     [Header("Movement Settings")]
     public float speed = 2f;
     public float detectionRange = 5f;
 
-    private Transform player;
-    private Rigidbody2D rb;
-    private Animator animator;
-
     [Header("Combat Settings")]
     public float attackRange = 1.2f;
     public float attackRate = 1.5f;
+    public int contactDamage = 10; // How much damage it deals to player
     private float nextAttackTime = 0f;
+
+    private Transform player;
+    private Rigidbody2D rb;
+    private Animator animator;
 
     void Start()
     {
@@ -58,12 +59,15 @@ public class Enemy : MonoBehaviour
     }
 
     // --- HEALTH LOGIC ---
-    public void TakeDamage(float damageAmount)
+    // Note: I made this 'int' to match your fireball script
+    public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
-        Debug.Log("Evil Tree took damage! HP left: " + currentHealth);
+        currentHealth = Mathf.Max(currentHealth, 0); // Prevents HP going below 0
 
-        // Play "Hurt" animation if you have one
+        Debug.Log($"{gameObject.name} took {damageAmount} damage. HP: {currentHealth}/{maxHealth}");
+
+        // Play "Hurt" animation trigger
         if (animator != null) animator.SetTrigger("Hurt");
 
         if (currentHealth <= 0)
@@ -74,9 +78,8 @@ public class Enemy : MonoBehaviour
 
     void Die()
     {
-        Debug.Log("Evil Tree has been chopped down!");
+        Debug.Log($"{gameObject.name} has been defeated!");
 
-        // If you have a death effect prefab, spawn it
         if (deathEffect != null)
         {
             Instantiate(deathEffect, transform.position, Quaternion.identity);
@@ -84,8 +87,8 @@ public class Enemy : MonoBehaviour
 
         Destroy(gameObject);
     }
-    // --- END HEALTH LOGIC ---
 
+    // --- MOVEMENT & COMBAT ---
     void MoveToPlayer()
     {
         Vector2 direction = (player.position - transform.position).normalized;
@@ -93,6 +96,7 @@ public class Enemy : MonoBehaviour
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
+        // Scaling 2, 2, 2 based on your previous edit
         if (direction.x > 0) transform.localScale = new Vector3(2, 2, 2);
         else if (direction.x < 0) transform.localScale = new Vector3(-2, 2, 2);
     }
@@ -104,6 +108,7 @@ public class Enemy : MonoBehaviour
 
         if (Time.time >= nextAttackTime)
         {
+            // Matches your trigger name "attack"
             if (animator != null) animator.SetTrigger("attack");
             nextAttackTime = Time.time + attackRate;
         }

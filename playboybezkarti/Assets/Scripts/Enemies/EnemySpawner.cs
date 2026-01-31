@@ -1,50 +1,50 @@
 using UnityEngine;
+using System.Collections; // Required for Coroutines
 
 public class EnemySpawner : MonoBehaviour
 {
     public GameObject enemyPrefab;
+    public GameObject spawnEffectPrefab; // Drag Spawn_FX here
     public float spawnInterval = 3f;
-    public float spawnRadius = 12f; // Distance from player to spawn
+    public float spawnRadius = 12f;
+    public float spawnDelay = 0.2f; // Short delay for the effect to play
 
     private float timer;
     private Transform playerTransform;
 
     void Update()
     {
-        // 1. Find the player if we don't have them yet
         if (playerTransform == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
-            {
-                playerTransform = playerObj.transform;
-            }
-            return; // Don't spawn until player is found
+            if (playerObj != null) playerTransform = playerObj.transform;
+            return;
         }
 
-        // 2. Standard timer logic
         timer += Time.deltaTime;
-
         if (timer >= spawnInterval)
         {
-            SpawnEnemyAroundPlayer();
+            StartCoroutine(SpawnRoutine());
             timer = 0f;
         }
     }
 
-    void SpawnEnemyAroundPlayer()
+    IEnumerator SpawnRoutine()
     {
-        // 3. Create a random point on a circle
-        // Random.insideUnitCircle.normalized gives us a point exactly 1 unit away in a random direction
+        // 1. Calculate Position
         Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        Vector3 spawnPosition = playerTransform.position + (Vector3)(randomDirection * spawnRadius);
 
-        // Multiply by our radius (e.g., 12 units away)
-        Vector2 spawnOffset = randomDirection * spawnRadius;
+        // 2. Play Spawn Effect
+        if (spawnEffectPrefab != null)
+        {
+            Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
+        }
 
-        // Add the player's current position so the enemy spawns relative to them
-        Vector3 spawnPosition = playerTransform.position + (Vector3)spawnOffset;
+        // 3. Wait slightly (so the flash happens before the enemy pops in)
+        yield return new WaitForSeconds(spawnDelay);
 
-        // 4. Spawn the enemy
+        // 4. Spawn Enemy
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
     }
 }
