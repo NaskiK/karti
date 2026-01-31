@@ -193,4 +193,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Fireball
   speed: 10
+  damage: 20
   lifetime: 2

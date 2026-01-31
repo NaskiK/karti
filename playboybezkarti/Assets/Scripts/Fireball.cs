@@ -10,11 +10,6 @@ public class Fireball : MonoBehaviour
     public void Initialize(Vector3 dir)
     {
         direction = dir.normalized;
-
-        // 🔥 ROTATE FIREBALL (sprite faces right by default)
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
         Destroy(gameObject, lifetime);
     }
 

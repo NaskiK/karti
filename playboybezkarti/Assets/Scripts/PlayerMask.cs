@@ -1,15 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System.Collections.Generic;
 
 public enum MaskType { None, Fire, Ice }
 
 public class PlayerMask : MonoBehaviour
 {
-    [Header("Fireball Ability")]
+    [Header("Fireball")]
     public GameObject fireballPrefab;
-    public float fireballCooldown = 0.3f;
-    private float fireballTimer;
 
     [Header("Fire Mask Sprites")]
     public Sprite fireIdleFront;
@@ -21,28 +18,21 @@ public class PlayerMask : MonoBehaviour
     public Sprite iceIdleBack;
     public Sprite iceIdleSide;
 
-    public MaskType currentMask = MaskType.None;
+    [HideInInspector] public MaskType currentMask = MaskType.None;
 
     private SpriteRenderer maskRenderer;
     private PlayerMovement movement;
     private PlayerStats stats;
-    private CircleCollider2D iceCollider;
 
-    private float iceTickTimer;
-    private HashSet<GameObject> enemiesInIce = new HashSet<GameObject>();
+    private float fireballTimer;
 
     void Awake()
     {
         movement = GetComponent<PlayerMovement>();
         stats = GetComponent<PlayerStats>();
-        iceCollider = GetComponent<CircleCollider2D>();
 
         Transform maskChild = transform.Find("Mask");
-        if (maskChild != null)
-            maskRenderer = maskChild.GetComponent<SpriteRenderer>();
-
-        if (iceCollider != null)
-            iceCollider.isTrigger = true;
+        maskRenderer = maskChild.GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -52,83 +42,52 @@ public class PlayerMask : MonoBehaviour
         if (currentMask == MaskType.Fire)
             HandleFireball();
 
-        if (currentMask == MaskType.Ice)
-            HandleIceAOE();
-
         TestMaskSwitch();
     }
 
-    // ================= FIRE =================
+    // ================= FIREBALL =================
     void HandleFireball()
     {
         fireballTimer -= Time.deltaTime;
 
         if (Mouse.current.leftButton.isPressed && fireballTimer <= 0f)
         {
-            Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            mousePos.z = 0;
-
-            Vector3 dir = mousePos - transform.position;
-            GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
-            fb.GetComponent<Fireball>().Initialize(dir);
-
-            fireballTimer = fireballCooldown;
+            ShootFireball();
+            fireballTimer = stats.fireballCooldown;
         }
     }
 
-    // ================= ICE =================
-    void HandleIceAOE()
+    void ShootFireball()
     {
-        if (iceCollider == null) return;
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+        mousePos.z = 0;
 
-        iceCollider.radius = stats.iceAOERadius;
+        Vector3 dir = mousePos - transform.position;
 
-        iceTickTimer -= Time.deltaTime;
-        if (iceTickTimer <= 0f)
-        {
-            foreach (GameObject enemy in enemiesInIce)
-            {
-                if (enemy == null) continue;
-                enemy.SendMessage("TakeDamage", (int)stats.iceDamagePerSecond, SendMessageOptions.DontRequireReceiver);
-            }
-
-            iceTickTimer = 1f;
-        }
+        GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
+        fb.GetComponent<Fireball>().Initialize(dir);
     }
 
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (currentMask != MaskType.Ice) return;
-        if (!other.CompareTag("Enemy")) return;
-
-        enemiesInIce.Add(other.gameObject);
-        other.SendMessage("ApplySlow", stats.iceSlowPercent, SendMessageOptions.DontRequireReceiver);
-    }
-
-    void OnTriggerExit2D(Collider2D other)
-    {
-        if (!other.CompareTag("Enemy")) return;
-
-        enemiesInIce.Remove(other.gameObject);
-        other.SendMessage("RemoveSlow", SendMessageOptions.DontRequireReceiver);
-    }
-
-    // ================= VISUAL =================
+    // ================= MASK VISUAL =================
     void UpdateMaskVisual()
     {
-        if (maskRenderer == null || movement == null) return;
-
-        Vector2 dir = movement.lastMoveDir;
+        Vector2 lastDir = movement.lastMoveDir;
 
         if (currentMask == MaskType.Fire)
-            SetSprite(dir, fireIdleFront, fireIdleBack, fireIdleSide);
+        {
+            SetMaskSprite(lastDir, fireIdleFront, fireIdleBack, fireIdleSide);
+        }
         else if (currentMask == MaskType.Ice)
-            SetSprite(dir, iceIdleFront, iceIdleBack, iceIdleSide);
+        {
+            SetMaskSprite(lastDir, iceIdleFront, iceIdleBack, iceIdleSide);
+        }
         else
+        {
             maskRenderer.sprite = null;
+        }
     }
 
-    void SetSprite(Vector2 dir, Sprite front, Sprite back, Sprite side)
+    void SetMaskSprite(Vector2 dir, Sprite front, Sprite back, Sprite side)
     {
         if (Mathf.Abs(dir.y) > Mathf.Abs(dir.x))
         {
@@ -146,10 +105,15 @@ public class PlayerMask : MonoBehaviour
     void TestMaskSwitch()
     {
         if (Keyboard.current.digit1Key.wasPressedThisFrame)
-            currentMask = MaskType.Fire;
+            EquipMask(MaskType.Fire);
         if (Keyboard.current.digit2Key.wasPressedThisFrame)
-            currentMask = MaskType.Ice;
+            EquipMask(MaskType.Ice);
         if (Keyboard.current.digit0Key.wasPressedThisFrame)
-            currentMask = MaskType.None;
+            EquipMask(MaskType.None);
+    }
+
+    public void EquipMask(MaskType mask)
+    {
+        currentMask = mask;
     }
 }
