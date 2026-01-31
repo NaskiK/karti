@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9087dd281d9154b479098a8eff8fedc4, type: 3}
-  m_Name: Predator_Speed_Upgrade
-  m_EditorClassIdentifier: Assembly-CSharp::MoveSpeedUpgrade
-  upgradeName: Predator
-  description: Move speed +1
+  m_Script: {fileID: 11500000, guid: b2e94bfa816dc684896ccfe9c3802a24, type: 3}
+  m_Name: Ultra_Giant_DefenceUpgrade
+  m_EditorClassIdentifier: Assembly-CSharp::MaxHpUpgrade
+  upgradeName: Ultra Giant
+  description: Max HP +20
   icon: {fileID: 0}
-  amount: 1
+  type: 1
+  amount: 20
