@@ -44,8 +44,9 @@ public class MovementTutorialUnity6 : MonoBehaviour
             Debug.Log("MovementFinished");
             objectiveTextMask.SetActive(true);
         }
-        if (fire && ice) { 
-            isCompleteMask= true;
+        if (fire && ice)
+        {
+            isCompleteMask = true;
 
             objectiveTextMask.SetActive(false); // Show the "Objective Complete" text!
             Debug.Log("MaskFinished");
@@ -53,7 +54,7 @@ public class MovementTutorialUnity6 : MonoBehaviour
         }
         if (lmb)
         {
-            isCompleteShoot= true;
+            isCompleteShoot = true;
             objectiveTextShoot.SetActive(false); // Show the "Objective Complete" text!
             Debug.Log("ShootFinished");
         }
