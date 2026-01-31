@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 73bc398a64a90a24293993aea2ee0aed
+guid: a8306840237ab914d950b68ca5e6e5f6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3780167739189336492
-    second: Witch Doctor_0
+      213: -7652073452389622248
+    second: rectTileUniverse_BasicDirt_Tiles_D_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Witch Doctor_0
+      name: rectTileUniverse_BasicDirt_Tiles_D_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 768
-        height: 768
+        width: 512
+        height: 512
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ca995c5d78ad57430800000000000000
-      internalID: 3780167739189336492
+      spriteID: 81e9e1bccbf5ec590800000000000000
+      internalID: -7652073452389622248
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Witch Doctor_0: 3780167739189336492
+      rectTileUniverse_BasicDirt_Tiles_D_0: -7652073452389622248
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
