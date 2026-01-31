@@ -11,6 +11,7 @@ public class UpgradeButton : MonoBehaviour
 
     public void Setup(Upgrade newUpgrade)
     {
+        Debug.Log("Setup called with: " + newUpgrade);
         upgrade = newUpgrade;
         titleText.text = upgrade.upgradeName;
         descriptionText.text = upgrade.description;
