@@ -7,9 +7,15 @@ public class DamageUpgrade : Upgrade
 
     public override void Apply(GameObject player)
     {
-        /*
-        PlayerCombat combat = player.GetComponent<PlayerCombat>();
-        combat.damage += amount;
-        */
+        PlayerStats stats = player.GetComponent<PlayerStats>();
+        if (stats == null)
+        {
+            Debug.LogError("PlayerStats component not found on player!");
+            return;
+        }
+
+        stats.damage += amount;
+        Debug.Log($"Applied Damage upgrade: +{amount} damage");
+        Debug.Log($"Current Damage: {stats.damage} damage");
     }
 }

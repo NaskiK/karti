@@ -11,17 +11,19 @@ public class UpgradeManager : MonoBehaviour
 
     public List<Upgrade> allUpgrades = new List<Upgrade>();
 
-    GameObject player;
+    public GameObject player;
 
     void Awake()
     {
-        GameObject gameobject = new GameObject();
         if (Instance == null)
             Instance = this;
         else
             Destroy(gameObject);
-        OpenUpgradeSelection(gameobject);
+
+        GameObject gameobject = new GameObject();
+        OpenUpgradeSelection(player);
     }
+
 
     public void OpenUpgradeSelection(GameObject playerRef)
     {
@@ -37,14 +39,30 @@ public class UpgradeManager : MonoBehaviour
     Upgrade GetRandomUpgrade(UpgradeType type)
     {
         var list = allUpgrades.FindAll(u => u.type == type);
-        return list[Random.Range(0, list.Count)];
+
+        if (list.Count == 0) return null;
+
+        // build a weighted list
+        List<Upgrade> weightedList = new List<Upgrade>();
+        foreach (var upgrade in list)
+        {
+            int weight = Mathf.Max(1, 11 - upgrade.rarity);
+            // higher rarity = smaller weight
+            for (int i = 0; i < weight; i++)
+                weightedList.Add(upgrade);
+        }
+
+        return weightedList[Random.Range(0, weightedList.Count)];
     }
 
     public void ChooseUpgrade(Upgrade upgrade)
     {
         upgrade.Apply(player);
 
-        upgradePanel.SetActive(false);
+        offenceButton.Setup(GetRandomUpgrade(UpgradeType.Offence));
+        defenceButton.Setup(GetRandomUpgrade(UpgradeType.Defence));
+
+        //upgradePanel.SetActive(false);
         Time.timeScale = 1f;
     }
 }

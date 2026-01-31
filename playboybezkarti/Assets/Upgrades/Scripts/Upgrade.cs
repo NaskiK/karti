@@ -13,5 +13,7 @@ public abstract class Upgrade : ScriptableObject
     public Sprite icon;
     public UpgradeType type;
 
+    public int rarity = 1;
+
     public abstract void Apply(GameObject player);
 }
