@@ -10,12 +10,15 @@ public class EnemySpawner : MonoBehaviour
     public float spawnInterval = 1.5f;
     public float spawnDelay = 0.3f;
 
+    [Header("Exclusion Settings")]
+    public LayerMask forbiddenLayer; // Set this to "Forbidden" in Inspector
+    public float checkRadius = 0.5f; // How big of a 'safe gap' to check for
+
     private float timer;
     private bool isPlayerInside = false;
 
     void Update()
     {
-        // Only run the timer and spawn if the player is currently in the zone
         if (isPlayerInside)
         {
             timer += Time.deltaTime;
@@ -28,30 +31,51 @@ public class EnemySpawner : MonoBehaviour
         }
         else
         {
-            // Optional: Reset timer when player leaves so they don't get 
-            // an instant spawn the moment they step back in.
             timer = 0f;
         }
     }
 
     IEnumerator SpawnRoutine()
     {
-        float randomX = Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
-        float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
+        Vector3 spawnPosition = Vector3.zero;
+        bool foundValidSpot = false;
+        int maxAttempts = 10; // Don't loop forever if area is full
+        int currentAttempt = 0;
 
-        Vector3 spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
-
-        if (spawnEffectPrefab != null)
+        while (!foundValidSpot && currentAttempt < maxAttempts)
         {
-            Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
+            float randomX = Random.Range(-transform.localScale.x / 2, transform.localScale.x / 2);
+            float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
+            spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
+
+            // Check if there is anything on the "Forbidden" layer at this spot
+            Collider2D hit = Physics2D.OverlapCircle(spawnPosition, checkRadius, forbiddenLayer);
+
+            if (hit == null)
+            {
+                foundValidSpot = true;
+            }
+            currentAttempt++;
         }
 
-        yield return new WaitForSeconds(spawnDelay);
-        Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        // Only spawn if we actually found a safe spot
+        if (foundValidSpot)
+        {
+            if (spawnEffectPrefab != null)
+            {
+                Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
+            }
+
+            yield return new WaitForSeconds(spawnDelay);
+            Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        }
+        else
+        {
+            Debug.LogWarning("Spawner could not find a valid spot (everything is blocked!)");
+        }
     }
 
     // --- TRIGGER DETECTION ---
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -72,7 +96,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = isPlayerInside ? Color.red : Color.green; // Red when active!
+        Gizmos.color = isPlayerInside ? Color.red : Color.green;
         Gizmos.DrawWireCube(transform.position, transform.localScale);
     }
 }
