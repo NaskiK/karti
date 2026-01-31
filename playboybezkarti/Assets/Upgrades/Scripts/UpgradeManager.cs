@@ -82,6 +82,7 @@ public class UpgradeManager : MonoBehaviour
         defenceButton.Setup(GetRandomUpgrade(UpgradeType.Defence));
 
         // Update the reroll button text if needed
+
         rerollButton.descriptionText.text = $"{remainingRerolls} rerolls left";
         
     }
