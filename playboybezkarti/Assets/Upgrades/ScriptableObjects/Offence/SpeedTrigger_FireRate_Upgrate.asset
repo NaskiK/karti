@@ -17,4 +17,4 @@ MonoBehaviour:
   icon: {fileID: 0}
   type: 0
   rarity: 1
-  cooldownReduction: 0.05
+  cooldownReduction: 0.2

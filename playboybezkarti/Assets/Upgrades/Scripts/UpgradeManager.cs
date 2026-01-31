@@ -8,8 +8,12 @@ public class UpgradeManager : MonoBehaviour
     public GameObject upgradePanel;
     public UpgradeButton offenceButton;
     public UpgradeButton defenceButton;
+    public UpgradeButton rerollButton;
 
     public List<Upgrade> allUpgrades = new List<Upgrade>();
+
+    public int maxRerolls = 3;
+    private int remainingRerolls;
 
     public GameObject player;
 
@@ -20,6 +24,7 @@ public class UpgradeManager : MonoBehaviour
         else
             Destroy(gameObject);
 
+        remainingRerolls = maxRerolls;
         GameObject gameobject = new GameObject();
     }
 
@@ -60,5 +65,24 @@ public class UpgradeManager : MonoBehaviour
 
         upgradePanel.SetActive(false);
         Time.timeScale = 1f;
+    }
+
+    public void RerollUpgrades()
+    {
+        if (remainingRerolls <= 0)
+        {
+            Debug.Log("No rerolls left!");
+            return;
+        }
+
+        remainingRerolls--;
+
+        // Pick new random upgrades
+        offenceButton.Setup(GetRandomUpgrade(UpgradeType.Offence));
+        defenceButton.Setup(GetRandomUpgrade(UpgradeType.Defence));
+
+        // Update the reroll button text if needed
+        rerollButton.descriptionText.text = $"{remainingRerolls} rerolls left";
+        
     }
 }
