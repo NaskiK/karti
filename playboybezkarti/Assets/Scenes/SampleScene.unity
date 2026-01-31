@@ -752,13 +752,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 759998077}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c98030248fdd8914fb6074a7141c5ff4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMask
-  fireMaskSprite: {fileID: 21300000, guid: 1729b194bff7334479d3be859b5a294d, type: 3}
-  iceMaskSprite: {fileID: 21300000, guid: 42c5a9552ce673e489a5b453cdfd3f1b, type: 3}
+  fireIdleFront: {fileID: 21300000, guid: 1729b194bff7334479d3be859b5a294d, type: 3}
+  fireIdleBack: {fileID: 0}
+  fireIdleSide: {fileID: 21300000, guid: d3753d0b09e349a42aa287aa225e7053, type: 3}
+  iceIdleFront: {fileID: 21300000, guid: 42c5a9552ce673e489a5b453cdfd3f1b, type: 3}
+  iceIdleBack: {fileID: 0}
+  iceIdleSide: {fileID: 21300000, guid: 8717b96f29b468947bba4e7277c13d22, type: 3}
   currentMask: 0
 --- !u!1 &821191369
 GameObject:

@@ -4,9 +4,15 @@ public enum MaskType { None, Fire, Ice }
 
 public class PlayerMask : MonoBehaviour
 {
-    [Header("Mask Sprites")]
-    public Sprite fireMaskSprite;
-    public Sprite iceMaskSprite;
+    [Header("Fire Mask Sprites")]
+    public Sprite fireIdleFront;
+    public Sprite fireIdleBack;
+    public Sprite fireIdleSide;
+
+    [Header("Ice Mask Sprites")]
+    public Sprite iceIdleFront;
+    public Sprite iceIdleBack;
+    public Sprite iceIdleSide;
 
     [HideInInspector]
     public MaskType currentMask = MaskType.None;
@@ -16,7 +22,7 @@ public class PlayerMask : MonoBehaviour
 
     void Awake()
     {
-        // Find the mask child
+        // Find the Mask child
         Transform maskChild = transform.Find("Mask");
         if (maskChild != null)
             maskRenderer = maskChild.GetComponent<SpriteRenderer>();
@@ -32,38 +38,50 @@ public class PlayerMask : MonoBehaviour
     void Update()
     {
         UpdateMaskVisual();
-        TestMaskSwitch();
+        TestMaskSwitch(); // temporary keys for testing
     }
 
     void UpdateMaskVisual()
     {
         if (maskRenderer == null || movement == null) return;
 
-        // Set mask sprite based on equipped mask
-        switch (currentMask)
-        {
-            case MaskType.Fire:
-                maskRenderer.sprite = fireMaskSprite;
-                break;
-            case MaskType.Ice:
-                maskRenderer.sprite = iceMaskSprite;
-                break;
-            default:
-                maskRenderer.sprite = null;
-                break;
-        }
+        Vector2 lastDir = movement.lastMoveDir;
 
-        // Flip mask for side movement
-        Vector2 lastDir = movement.lastMoveDir; // Make lastMoveDir public or use a getter
-        if (Mathf.Abs(lastDir.x) > Mathf.Abs(lastDir.y))
+        // Determine mask sprite and flip
+        if (currentMask == MaskType.Fire)
         {
-            maskRenderer.flipX = lastDir.x < 0; // flip when moving left
+            if (Mathf.Abs(lastDir.y) > Mathf.Abs(lastDir.x))
+            {
+                // Moving up/down → front/back
+                maskRenderer.sprite = lastDir.y > 0 ? fireIdleBack : fireIdleFront;
+                maskRenderer.flipX = false;
+            }
+            else
+            {
+                // Moving left/right → side
+                maskRenderer.sprite = fireIdleSide;
+                maskRenderer.flipX = lastDir.x < 0; // flip left
+            }
+        }
+        else if (currentMask == MaskType.Ice)
+        {
+            if (Mathf.Abs(lastDir.y) > Mathf.Abs(lastDir.x))
+            {
+                maskRenderer.sprite = lastDir.y > 0 ? iceIdleBack : iceIdleFront;
+                maskRenderer.flipX = false;
+            }
+            else
+            {
+                maskRenderer.sprite = iceIdleSide;
+                maskRenderer.flipX = lastDir.x < 0;
+            }
         }
         else
         {
-            maskRenderer.flipX = false; // no flip for up/down
+            maskRenderer.sprite = null;
         }
     }
+
 
     void TestMaskSwitch()
     {
