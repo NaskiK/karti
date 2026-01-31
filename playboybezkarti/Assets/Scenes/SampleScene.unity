@@ -26292,7 +26292,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_MaskInteraction: 0
   m_Sprite: {fileID: 21300000, guid: 7cefe9e9e8c984bbd9ff43235be8f54f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -26365,8 +26365,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e51ee3d44f72b24aa3fde155186ca79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCStats
-  maxHP: 100
-  currentHP: 0
+  maxHealth: 100
+  currentHealth: 0
 --- !u!114 &2022764257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26381,13 +26381,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCFollow
   anchorPoint: {fileID: 0}
   followSpeed: 2.5
-  fleeSpeed: 5
+  fleeSpeed: 3.2
   wanderRadius: 3
   detectionRange: 2.5
-  wallAvoidanceRange: 1
+  wallAvoidanceRange: 2
   wallLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
 --- !u!58 &2022764258
 CircleCollider2D:
   m_ObjectHideFlags: 0

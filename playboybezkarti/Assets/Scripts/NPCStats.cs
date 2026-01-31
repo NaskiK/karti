@@ -2,29 +2,29 @@ using UnityEngine;
 
 public class NPCStats : MonoBehaviour
 {
-    public int maxHP = 100;
-    public int currentHP;
+    public float maxHealth = 100f;
+    public float currentHealth;
 
     void Start()
     {
-        currentHP = maxHP;
+        currentHealth = maxHealth;
     }
 
-    public void TakeDamage(int amount)
+    public void TakeDamage(float damage)
     {
-        currentHP -= amount;
-        Debug.Log("NPC hit! Current HP: " + currentHP);
+        currentHealth -= damage;
+        Debug.Log("Mole Health: " + currentHealth);
 
-        if (currentHP <= 0)
+        if (currentHealth <= 0)
         {
-            GameOver();
+            Die();
         }
     }
 
-    void GameOver()
+    void Die()
     {
-        Debug.Log("The NPC died. MISSION FAILED.");
-        // Pauses the game - you can replace this with a UI screen later
-        Time.timeScale = 0;
+        // For now, he just disappears. Later you can add a burrow animation!
+        Debug.Log("Mole fainted!");
+        gameObject.SetActive(false);
     }
 }
