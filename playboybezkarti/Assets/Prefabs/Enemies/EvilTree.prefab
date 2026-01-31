@@ -132,7 +132,7 @@ MonoBehaviour:
   maxHealth: 50
   deathEffect: {fileID: 4302384401020223292, guid: 5c67f7e8bc746404ebbc7c7d41a61dec, type: 3}
   speed: 2
-  detectionRange: 5
+  detectionRange: 6
   attackRange: 1.2
   attackRate: 1.5
 --- !u!50 &-7963692294030615399
