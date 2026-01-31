@@ -22,7 +22,9 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private SpriteRenderer sr;
 
-    private Vector2 moveInput;
+    // private Vector2 moveInput;
+    [HideInInspector] public Vector2 moveInput;
+
     [HideInInspector] public Vector2 lastMoveDir = Vector2.down;
 
     private float walkTimer;
