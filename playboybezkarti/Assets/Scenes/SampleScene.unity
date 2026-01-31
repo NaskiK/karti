@@ -25505,7 +25505,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 31dbdc4c8dce14f4592967c2d6c92acd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyManager
-  difficultyScalePerMinute: 0.2
+  difficultyScalePerMinute: 0.5
   gameTimer: 0
 --- !u!4 &1837873026
 Transform:
