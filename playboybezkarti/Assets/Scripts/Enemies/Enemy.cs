@@ -33,8 +33,25 @@ public class Enemy : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
+
+        // --- DIFFICULTY SCALING ---
+        // We look at the DifficultyManager to boost stats before setting base variables
+        if (DifficultyManager.instance != null)
+        {
+            float multiplier = DifficultyManager.instance.GetDifficultyMultiplier();
+
+            maxHealth = Mathf.RoundToInt(maxHealth * multiplier);
+            speed = speed * multiplier;
+            contactDamage = Mathf.RoundToInt(contactDamage * multiplier);
+
+            // Optionally scale XP so harder enemies give more reward
+            xpOnDeath = Mathf.RoundToInt(xpOnDeath * multiplier);
+
+            Debug.Log($"{gameObject.name} spawned at Level {multiplier:F1}");
+        }
+
         currentHealth = maxHealth;
-        baseSpeed = speed;
+        baseSpeed = speed; // Set baseSpeed AFTER scaling so slow effects work correctly
 
         if (animator != null) animator.SetBool("IsMoving", false);
     }
@@ -94,7 +111,7 @@ public class Enemy : MonoBehaviour
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
-        // Flip sprite
+        // Flip sprite (Set to 5 based on your last preference)
         if (direction.x > 0) transform.localScale = new Vector3(5, 5, 2);
         else if (direction.x < 0) transform.localScale = new Vector3(-5, 5, 2);
     }

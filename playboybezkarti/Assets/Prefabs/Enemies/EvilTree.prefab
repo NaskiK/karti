@@ -134,7 +134,7 @@ MonoBehaviour:
   deathEffect: {fileID: 0}
   speed: 1.2
   detectionRange: 50
-  attackRange: 1.5
+  attackRange: 1.8
   attackRate: 1
   contactDamage: 5
 --- !u!50 &-7963692294030615399
