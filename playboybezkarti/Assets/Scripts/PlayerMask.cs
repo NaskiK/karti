@@ -5,10 +5,8 @@ public enum MaskType { None, Fire, Ice }
 
 public class PlayerMask : MonoBehaviour
 {
-    [Header("Fireball Ability")]
-    public GameObject fireballPrefab;     // Drag your Fireball prefab here
-    public float fireballCooldown = 0.3f; // Time between shots
-    private float fireballTimer = 0f;
+    [Header("Fireball")]
+    public GameObject fireballPrefab;
 
     [Header("Fire Mask Sprites")]
     public Sprite fireIdleFront;
@@ -20,25 +18,21 @@ public class PlayerMask : MonoBehaviour
     public Sprite iceIdleBack;
     public Sprite iceIdleSide;
 
-    [HideInInspector]
-    public MaskType currentMask = MaskType.None;
+    [HideInInspector] public MaskType currentMask = MaskType.None;
 
     private SpriteRenderer maskRenderer;
     private PlayerMovement movement;
+    private PlayerStats stats;
+
+    private float fireballTimer;
 
     void Awake()
     {
-        // Find the Mask child
-        Transform maskChild = transform.Find("Mask");
-        if (maskChild != null)
-            maskRenderer = maskChild.GetComponent<SpriteRenderer>();
-        else
-            Debug.LogError("Mask child not found on Player! Create a child named 'Mask' with a SpriteRenderer.");
-
-        // Get PlayerMovement reference
         movement = GetComponent<PlayerMovement>();
-        if (movement == null)
-            Debug.LogError("PlayerMovement component not found on Player!");
+        stats = GetComponent<PlayerStats>();
+
+        Transform maskChild = transform.Find("Mask");
+        maskRenderer = maskChild.GetComponent<SpriteRenderer>();
     }
 
     void Update()
@@ -48,10 +42,10 @@ public class PlayerMask : MonoBehaviour
         if (currentMask == MaskType.Fire)
             HandleFireball();
 
-        TestMaskSwitch(); // temporary keys for testing mask switching
+        TestMaskSwitch();
     }
 
-    // ===================== FIREBALL LOGIC =====================
+    // ================= FIREBALL =================
     void HandleFireball()
     {
         fireballTimer -= Time.deltaTime;
@@ -59,55 +53,33 @@ public class PlayerMask : MonoBehaviour
         if (Mouse.current.leftButton.isPressed && fireballTimer <= 0f)
         {
             ShootFireball();
-            fireballTimer = fireballCooldown;
+            fireballTimer = stats.fireballCooldown;
         }
     }
 
     void ShootFireball()
     {
-        if (fireballPrefab == null) return;
-
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         mousePos.z = 0;
+
         Vector3 dir = mousePos - transform.position;
 
         GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
-        fb.GetComponent<Fireball>().Initialize(dir); // No damage passed
+        fb.GetComponent<Fireball>().Initialize(dir);
     }
 
-
-    // ===================== MASK VISUAL =====================
+    // ================= MASK VISUAL =================
     void UpdateMaskVisual()
     {
-        if (maskRenderer == null || movement == null) return;
-
         Vector2 lastDir = movement.lastMoveDir;
 
         if (currentMask == MaskType.Fire)
         {
-            if (Mathf.Abs(lastDir.y) > Mathf.Abs(lastDir.x))
-            {
-                maskRenderer.sprite = lastDir.y > 0 ? fireIdleBack : fireIdleFront;
-                maskRenderer.flipX = false;
-            }
-            else
-            {
-                maskRenderer.sprite = fireIdleSide;
-                maskRenderer.flipX = lastDir.x < 0;
-            }
+            SetMaskSprite(lastDir, fireIdleFront, fireIdleBack, fireIdleSide);
         }
         else if (currentMask == MaskType.Ice)
         {
-            if (Mathf.Abs(lastDir.y) > Mathf.Abs(lastDir.x))
-            {
-                maskRenderer.sprite = lastDir.y > 0 ? iceIdleBack : iceIdleFront;
-                maskRenderer.flipX = false;
-            }
-            else
-            {
-                maskRenderer.sprite = iceIdleSide;
-                maskRenderer.flipX = lastDir.x < 0;
-            }
+            SetMaskSprite(lastDir, iceIdleFront, iceIdleBack, iceIdleSide);
         }
         else
         {
@@ -115,7 +87,21 @@ public class PlayerMask : MonoBehaviour
         }
     }
 
-    // ===================== TEST KEYS =====================
+    void SetMaskSprite(Vector2 dir, Sprite front, Sprite back, Sprite side)
+    {
+        if (Mathf.Abs(dir.y) > Mathf.Abs(dir.x))
+        {
+            maskRenderer.sprite = dir.y > 0 ? back : front;
+            maskRenderer.flipX = false;
+        }
+        else
+        {
+            maskRenderer.sprite = side;
+            maskRenderer.flipX = dir.x < 0;
+        }
+    }
+
+    // ================= TEST =================
     void TestMaskSwitch()
     {
         if (Keyboard.current.digit1Key.wasPressedThisFrame)
@@ -126,7 +112,6 @@ public class PlayerMask : MonoBehaviour
             EquipMask(MaskType.None);
     }
 
-    // ===================== EQUIP MASK =====================
     public void EquipMask(MaskType mask)
     {
         currentMask = mask;
