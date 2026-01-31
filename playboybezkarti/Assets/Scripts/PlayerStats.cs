@@ -6,17 +6,24 @@ public class PlayerStats : MonoBehaviour
     public int maxHP = 100;
     public int currentHP;
 
-    [Header("Combat")]
+    [Header("Base Combat")]
     public int damage = 10;
 
     [Header("Fire Mask")]
     public float fireballCooldown = 0.3f;
+
+    [Header("Ice Mask")]
+    public float iceAOERadius = 1.5f;
+    public float iceDamagePerSecond = 5f;
+    [Range(0f, 1f)]
+    public float iceSlowPercent = 0.5f; // 0.5 = 50% slow
 
     void Awake()
     {
         currentHP = maxHP;
     }
 
+    // ================= HEALTH =================
     public void TakeDamage(int amount)
     {
         currentHP -= amount;
@@ -33,6 +40,7 @@ public class PlayerStats : MonoBehaviour
 
     void Die()
     {
+        Debug.Log("Player died");
         gameObject.SetActive(false);
     }
 }
