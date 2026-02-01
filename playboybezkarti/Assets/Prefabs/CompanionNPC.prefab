@@ -194,8 +194,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCFollow
   anchorPoint: {fileID: 0}
-  followSpeed: 2.5
-  fleeSpeed: 3.2
+  followSpeed: 1.4
+  fleeSpeed: 2.2
   wanderRadius: 3
   detectionRange: 2.5
   wallAvoidanceRange: 2

@@ -22,7 +22,7 @@ public class NPCFollow : MonoBehaviour
 
     // --- EXIT LOGIC ---
     private bool isLeaving = false;
-    private Vector2 exitDirection = new Vector2(0, -1); // Walks DOWN to leave
+    private Vector2 exitDirection = new Vector2(0, 1); // Walks DOWN to leave
 
     void Start()
     {
