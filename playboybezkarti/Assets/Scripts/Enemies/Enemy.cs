@@ -117,6 +117,15 @@ public class Enemy : MonoBehaviour
         if (sfx != null)
             sfx.PlayOneShot(sfx.enemyDeath, 1f);
 
+        // --- NEW: TELL SPAWNER ABOUT THE KILL ---
+        // We find the spawner in the scene and call RegisterKill
+        EnemySpawner spawner = Object.FindFirstObjectByType<EnemySpawner>();
+        if (spawner != null)
+        {
+            spawner.RegisterKill();
+        }
+        // ----------------------------------------
+
         GiveXP();
         Destroy(gameObject);
     }
