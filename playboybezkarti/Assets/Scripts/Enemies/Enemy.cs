@@ -21,7 +21,7 @@ public class Enemy : MonoBehaviour
     public int contactDamage = 10;
     private float nextAttackTime = 0f;
 
-    private Transform player;
+    private Transform currentTarget; // Renamed from player to currentTarget
     private Rigidbody2D rb;
     private Animator animator;
 
@@ -45,39 +45,32 @@ public class Enemy : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
 
-        // --- DIFFICULTY SCALING ---
-        // We look at the DifficultyManager to boost stats before setting base variables
         if (DifficultyManager.instance != null)
         {
             float multiplier = DifficultyManager.instance.GetDifficultyMultiplier();
-
             maxHealth = Mathf.RoundToInt(maxHealth * multiplier);
             speed = speed * multiplier;
             contactDamage = Mathf.RoundToInt(contactDamage * multiplier);
-
-            // Optionally scale XP so harder enemies give more reward
             xpOnDeath = Mathf.RoundToInt(xpOnDeath * multiplier);
-
-            Debug.Log($"{gameObject.name} spawned at Level {multiplier:F1}");
         }
 
         currentHealth = maxHealth;
-        baseSpeed = speed; // Set baseSpeed AFTER scaling so slow effects work correctly
+        baseSpeed = speed;
 
         if (animator != null) animator.SetBool("IsMoving", false);
     }
 
     void Update()
     {
-        FindPlayerIfNeeded();
+        FindTargetIfNeeded(); // Updated naming
 
-        if (player == null)
+        if (currentTarget == null)
         {
             StopMoving();
             return;
         }
 
-        float distance = Vector2.Distance(transform.position, player.position);
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
 
         if (distance <= attackRange)
         {
@@ -93,20 +86,13 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    // ===== DAMAGE =====
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
-
-        if (sfx != null)
-            sfx.PlayOneShot(sfx.enemyHit, 0.7f);
-
+        if (sfx != null) sfx.PlayOneShot(sfx.enemyHit, 0.7f);
         currentHealth = Mathf.Max(currentHealth, 0);
-
         if (animator != null) animator.SetTrigger("Hurt");
-
-        if (currentHealth <= 0)
-            Die();
+        if (currentHealth <= 0) Die();
     }
 
     void Die()
@@ -117,28 +103,20 @@ public class Enemy : MonoBehaviour
         if (sfx != null)
             sfx.PlayOneShot(sfx.enemyDeath, 1f);
 
-        // --- NEW: TELL SPAWNER ABOUT THE KILL ---
-        // We find the spawner in the scene and call RegisterKill
         EnemySpawner spawner = Object.FindFirstObjectByType<EnemySpawner>();
-        if (spawner != null)
-        {
-            spawner.RegisterKill();
-        }
-        // ----------------------------------------
+        if (spawner != null) spawner.RegisterKill();
 
         GiveXP();
         Destroy(gameObject);
     }
 
-    // ===== MOVEMENT =====
     void MoveToPlayer()
     {
-        Vector2 direction = (player.position - transform.position).normalized;
+        Vector2 direction = (currentTarget.position - transform.position).normalized;
         rb.linearVelocity = direction * speed;
 
         if (animator != null) animator.SetBool("IsMoving", true);
 
-        // Flip sprite (Set to 5 based on your last preference)
         if (direction.x > 0) transform.localScale = new Vector3(5, 5, 2);
         else if (direction.x < 0) transform.localScale = new Vector3(-5, 5, 2);
     }
@@ -161,28 +139,48 @@ public class Enemy : MonoBehaviour
         if (animator != null) animator.SetBool("IsMoving", false);
     }
 
-    void FindPlayerIfNeeded()
+    void FindTargetIfNeeded()
     {
-        if (player != null) return;
+        // Re-check target if current one is destroyed or disabled
+        if (currentTarget != null && currentTarget.gameObject.activeInHierarchy) return;
+
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
-        if (playerObj != null) player = playerObj.transform;
+        GameObject npcObj = GameObject.FindGameObjectWithTag("NPC");
+
+        if (playerObj != null && npcObj != null)
+        {
+            float distToPlayer = Vector2.Distance(transform.position, playerObj.transform.position);
+            float distToNPC = Vector2.Distance(transform.position, npcObj.transform.position);
+            currentTarget = (distToPlayer < distToNPC) ? playerObj.transform : npcObj.transform;
+        }
+        else if (playerObj != null) currentTarget = playerObj.transform;
+        else if (npcObj != null) currentTarget = npcObj.transform;
     }
 
-    // ===== DAMAGE FROM ANIMATION EVENT =====
     public void DealDamageAtSwing()
     {
-        if (player == null) return;
+        if (currentTarget == null) return;
 
-        float distance = Vector2.Distance(transform.position, player.position);
+        float distance = Vector2.Distance(transform.position, currentTarget.position);
 
         if (distance <= attackRange + 0.5f)
         {
-            PlayerStats stats = player.GetComponent<PlayerStats>();
-            if (stats != null)
+            // Play the attack sound regardless of who we hit
+            if (sfx != null) sfx.PlayOneShot(sfx.enemyAttack, 0.8f);
+
+            // 1. Try to damage the Player
+            PlayerStats pStats = currentTarget.GetComponent<PlayerStats>();
+            if (pStats != null)
             {
-                if (sfx != null)
-                    sfx.PlayOneShot(sfx.enemyAttack, 0.8f);
-                stats.TakeDamage(contactDamage);
+                pStats.TakeDamage(contactDamage);
+                return; // Target hit, stop looking
+            }
+
+            // 2. Try to damage the NPC (The Mole)
+            NPCStats nStats = currentTarget.GetComponent<NPCStats>(); // <--- Matches your script name!
+            if (nStats != null)
+            {
+                nStats.TakeDamage(contactDamage);
             }
         }
     }
@@ -190,11 +188,9 @@ public class Enemy : MonoBehaviour
     void GiveXP()
     {
         PlayerXP playerXP = FindObjectOfType<PlayerXP>();
-        if (playerXP != null)
-            playerXP.AddXP(xpOnDeath);
+        if (playerXP != null) playerXP.AddXP(xpOnDeath);
     }
 
-    // ===== ICE MASK INTERACTIONS =====
     public void ApplySlow(float slowPercent)
     {
         if (isSlowed) return;

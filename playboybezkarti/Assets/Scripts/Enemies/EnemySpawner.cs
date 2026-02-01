@@ -7,7 +7,10 @@ public class EnemySpawner : MonoBehaviour
     public GameObject spawnEffectPrefab;
 
     [Header("Companion Settings")]
-    public NPCFollow moleScript; // Drag the CompanionNPC here
+    public NPCFollow moleScript;
+
+    [Header("Portal Settings")]
+    public LocalPortal endPortal; // DRAG YOUR PORTAL HERE IN THE INSPECTOR
 
     [Header("Spawn Timing")]
     public float spawnInterval = 1.5f;
@@ -40,7 +43,6 @@ public class EnemySpawner : MonoBehaviour
             }
         }
 
-        // Check if all enemies are dead
         if (spawnedCount >= maxToSpawn && killedCount >= maxToSpawn)
         {
             FinishLevel();
@@ -50,12 +52,19 @@ public class EnemySpawner : MonoBehaviour
     void FinishLevel()
     {
         hasFinished = true;
+
         if (moleScript != null)
         {
-            moleScript.LeaveMap(); // Tell the mole to walk through walls and leave
+            moleScript.LeaveMap();
         }
-        Debug.Log("Cursed Woods Cleared!");
-        // Keep the spawner object for a moment, then disable
+
+        // --- NEW: UNLOCK THE PORTAL ---
+        if (endPortal != null)
+        {
+            endPortal.UnlockPortal();
+        }
+
+        Debug.Log("Cursed Woods Cleared! Portal is now active.");
         Invoke("DisableSpawner", 0.5f);
     }
 
