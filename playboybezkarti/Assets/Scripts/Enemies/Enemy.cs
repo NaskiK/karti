@@ -99,14 +99,6 @@ public class Enemy : MonoBehaviour
         if (deathEffect != null)
             Instantiate(deathEffect, transform.position, Quaternion.identity);
 
-        // --- NEW: Tell Spawner to count the kill ---
-        EnemySpawner spawner = Object.FindFirstObjectByType<EnemySpawner>();
-        if (spawner != null)
-        {
-            spawner.RegisterKill();
-        }
-        // -------------------------------------------
-
         GiveXP();
         Destroy(gameObject);
     }
