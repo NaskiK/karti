@@ -11,15 +11,21 @@ public class EnemySpawner : MonoBehaviour
     public float spawnDelay = 0.3f;
 
     [Header("Exclusion Settings")]
-    public LayerMask forbiddenLayer; // Set this to "Forbidden" in Inspector
-    public float checkRadius = 0.5f; // How big of a 'safe gap' to check for
+    public LayerMask forbiddenLayer;
+    public float checkRadius = 0.5f;
+
+    [Header("Wave Limits")]
+    public int maxToSpawn = 10; // SET THIS IN INSPECTOR: How many trees total?
+    private int spawnedCount = 0;
+    private int killedCount = 0;
 
     private float timer;
     private bool isPlayerInside = false;
 
     void Update()
     {
-        if (isPlayerInside)
+        // Only run logic if player is inside AND we haven't hit the spawn limit
+        if (isPlayerInside && spawnedCount < maxToSpawn)
         {
             timer += Time.deltaTime;
 
@@ -33,13 +39,20 @@ public class EnemySpawner : MonoBehaviour
         {
             timer = 0f;
         }
+
+        // Shutdown the spawner entirely once every tree spawned is dead
+        if (spawnedCount >= maxToSpawn && killedCount >= maxToSpawn)
+        {
+            Debug.Log("Cursed Woods Cleared! Spawner Deactivated.");
+            gameObject.SetActive(false);
+        }
     }
 
     IEnumerator SpawnRoutine()
     {
         Vector3 spawnPosition = Vector3.zero;
         bool foundValidSpot = false;
-        int maxAttempts = 10; // Don't loop forever if area is full
+        int maxAttempts = 10;
         int currentAttempt = 0;
 
         while (!foundValidSpot && currentAttempt < maxAttempts)
@@ -48,19 +61,14 @@ public class EnemySpawner : MonoBehaviour
             float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
             spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
 
-            // Check if there is anything on the "Forbidden" layer at this spot
             Collider2D hit = Physics2D.OverlapCircle(spawnPosition, checkRadius, forbiddenLayer);
-
-            if (hit == null)
-            {
-                foundValidSpot = true;
-            }
+            if (hit == null) foundValidSpot = true;
             currentAttempt++;
         }
 
-        // Only spawn if we actually found a safe spot
         if (foundValidSpot)
         {
+            spawnedCount++; // Increment count here
             if (spawnEffectPrefab != null)
             {
                 Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
@@ -69,19 +77,21 @@ public class EnemySpawner : MonoBehaviour
             yield return new WaitForSeconds(spawnDelay);
             Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         }
-        else
-        {
-            Debug.LogWarning("Spawner could not find a valid spot (everything is blocked!)");
-        }
     }
 
-    // --- TRIGGER DETECTION ---
+    // New function for the Enemy to call
+    public void RegisterKill()
+    {
+        killedCount++;
+        Debug.Log($"Enemy Defeated. Progress: {killedCount}/{maxToSpawn}");
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             isPlayerInside = true;
-            Debug.Log("Player entered the Cursed Woods! Spawning started.");
+            Debug.Log("Player entered the Cursed Woods!");
         }
     }
 
@@ -90,7 +100,6 @@ public class EnemySpawner : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerInside = false;
-            Debug.Log("Player left the zone. Spawning stopped.");
         }
     }
 

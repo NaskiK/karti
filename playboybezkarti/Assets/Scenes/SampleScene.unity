@@ -928,6 +928,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   checkRadius: 0.5
+  maxToSpawn: 40
 --- !u!4 &555012554
 Transform:
   m_ObjectHideFlags: 0
