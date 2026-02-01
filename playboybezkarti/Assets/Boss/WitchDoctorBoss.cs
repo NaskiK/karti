@@ -110,10 +110,10 @@ public class WitchDoctorBoss : MonoBehaviour
         Vector2 shootDir = (player.position - firePoint.position).normalized;
 
         // 3. Initialize the potion script
-       /* BossPotion potionScript = potion.GetComponent<BossPotion>();
+        BossPotion potionScript = potion.GetComponent<BossPotion>();
         if (potionScript != null)
         {
             potionScript.Setup(shootDir);
-        }*/
+        }
     }
 }
