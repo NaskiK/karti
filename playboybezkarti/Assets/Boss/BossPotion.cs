@@ -5,7 +5,7 @@ public class BossPotion : MonoBehaviour
     public float speed = 7f;
     public float rotationSpeed = 360f; // Degrees per second
     private Vector2 moveDirection;
-
+    public int dmg = 10;
     public void Setup(Vector2 direction)
     {
         moveDirection = direction.normalized;
@@ -28,6 +28,12 @@ public class BossPotion : MonoBehaviour
             if (collision is CircleCollider2D)
             {
                 return; // Ignore this specific collider and keep flying!
+            }
+            PlayerStats stats = collision.GetComponent<PlayerStats>();
+            if (stats != null)
+            {
+               
+                stats.TakeDamage(dmg);
             }
             // Add your explosion/poison effect logic here!
             Destroy(gameObject);

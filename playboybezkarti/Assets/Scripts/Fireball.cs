@@ -25,13 +25,25 @@ public class Fireball : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Enemy"))
-        {
-            Enemy enemy = other.GetComponent<Enemy>();
-            PlayerStats stats = GameObject.FindWithTag("Player").GetComponent<PlayerStats>();
+        if (!other.CompareTag("Enemy")) return;
 
+        PlayerStats stats = GameObject.FindWithTag("Player")
+                                      .GetComponent<PlayerStats>();
+
+        // 🔥 NORMAL ENEMY
+        if (other.TryGetComponent<Enemy>(out Enemy enemy))
+        {
             enemy.TakeDamage(stats.damage);
             Destroy(gameObject);
+            return;
+        }
+
+        // 👹 BOSS
+        if (other.TryGetComponent<WitchDoctorBoss>(out WitchDoctorBoss boss))
+        {
+            boss.TakeDamage(stats.damage);
+            Destroy(gameObject);
+            return;
         }
     }
 }
