@@ -5,7 +5,6 @@ public class BossPotion : MonoBehaviour
     public float speed = 7f;
     public float rotationSpeed = 360f; // Degrees per second
     private Vector2 moveDirection;
-    public Transform player;
     public int dmg = 10;
     public void Setup(Vector2 direction)
     {
@@ -30,7 +29,7 @@ public class BossPotion : MonoBehaviour
             {
                 return; // Ignore this specific collider and keep flying!
             }
-            PlayerStats stats = player.GetComponent<PlayerStats>();
+            PlayerStats stats = collision.GetComponent<PlayerStats>();
             if (stats != null)
             {
                

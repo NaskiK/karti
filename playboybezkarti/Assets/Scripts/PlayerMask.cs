@@ -154,20 +154,26 @@ public class PlayerMask : MonoBehaviour
         iceTickTimer -= Time.deltaTime;
         if (iceTickTimer <= 0f)
         {
-            // 🔥 ITERATE OVER A COPY
-            foreach (GameObject enemy in new List<GameObject>(enemiesInIce))
+            foreach (GameObject target in new List<GameObject>(enemiesInIce))
             {
-                if (enemy == null)
+                if (target == null)
                 {
-                    enemiesInIce.Remove(enemy);
+                    enemiesInIce.Remove(target);
                     continue;
                 }
 
-                enemy.SendMessage(
-                    "TakeDamage",
-                    (int)stats.iceDamagePerSecond,
-                    SendMessageOptions.DontRequireReceiver
-                );
+                // ❄️ NORMAL ENEMY
+                if (target.TryGetComponent<Enemy>(out Enemy enemy))
+                {
+                    enemy.TakeDamage((int)stats.iceDamagePerSecond);
+                    continue;
+                }
+
+                // 👹 BOSS
+                if (target.TryGetComponent<WitchDoctorBoss>(out WitchDoctorBoss boss))
+                {
+                    boss.TakeDamage((int)stats.iceDamagePerSecond);
+                }
             }
             if (sfx != null)
                 sfx.PlayOneShot(sfx.iceFieldLoop, 0.8f);
@@ -181,7 +187,12 @@ public class PlayerMask : MonoBehaviour
         if (!other.CompareTag("Enemy")) return;
 
         enemiesInIce.Add(other.gameObject);
-        other.SendMessage("ApplySlow", stats.iceSlowPercent, SendMessageOptions.DontRequireReceiver);
+
+        // ❄️ Slow ONLY normal enemies
+        if (other.TryGetComponent<Enemy>(out Enemy enemy))
+        {
+            enemy.ApplySlow(stats.iceSlowPercent);
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
@@ -189,7 +200,11 @@ public class PlayerMask : MonoBehaviour
         if (!other.CompareTag("Enemy")) return;
 
         enemiesInIce.Remove(other.gameObject);
-        other.SendMessage("RemoveSlow", SendMessageOptions.DontRequireReceiver);
+
+        if (other.TryGetComponent<Enemy>(out Enemy enemy))
+        {
+            enemy.RemoveSlow();
+        }
     }
 
     // ================= VISUAL =================

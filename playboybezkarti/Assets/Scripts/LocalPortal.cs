@@ -10,6 +10,8 @@ public class LocalPortal : MonoBehaviour
     public float cooldown = 1.0f;
     private static float lastTeleportTime;
 
+    public GameObject witchdoctor;
+
     void Start()
     {
         // Hide the portal visually if it's locked
@@ -37,6 +39,12 @@ public class LocalPortal : MonoBehaviour
             {
                 lastTeleportTime = Time.time;
                 other.transform.position = destination.position;
+
+
+                if (witchdoctor != null)
+                {
+                    witchdoctor.SetActive(true);
+                }
             }
         }
     }

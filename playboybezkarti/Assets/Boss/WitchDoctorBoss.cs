@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class WitchDoctorBoss : MonoBehaviour
 {
@@ -21,10 +22,25 @@ public class WitchDoctorBoss : MonoBehaviour
     private Animator anim;
     private Vector2 moveDirection;
 
+    [Header("Health Settings")]
+    public int maxHealth = 50;
+    public int currentHealth;
+
+    [Header("Visual Feedback")]
+    public SpriteRenderer spriteRenderer;
+    public Color damageColor = Color.red;
+    public float flashDuration = 0.15f;
+
+    private Color originalColor;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
+
+        currentHealth = maxHealth;
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = spriteRenderer.color;
 
         // Automatically find the player if not assigned
         if (player == null)
@@ -77,8 +93,11 @@ public class WitchDoctorBoss : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Apply physics movement
-        rb.linearVelocity = moveDirection * moveSpeed;
+        // Instead of: rb.linearVelocity = moveDirection * moveSpeed;
+        // Use MovePosition for "Solid" movement:
+        Vector2 nextPosition = rb.position + moveDirection * moveSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(nextPosition);
+
     }
 
     void UpdateAnimations()
@@ -115,5 +134,40 @@ public class WitchDoctorBoss : MonoBehaviour
         {
             potionScript.Setup(shootDir);
         }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Max(currentHealth, 0);
+        // 1. Visual Flash
+        StartCoroutine(FlashRed());
+
+        Debug.Log("Boss Health: " + currentHealth);
+
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    private System.Collections.IEnumerator FlashRed()
+    {
+        spriteRenderer.color = damageColor;
+        yield return new WaitForSeconds(flashDuration);
+        spriteRenderer.color = originalColor;
+    }
+
+    void Die()
+    {
+        Debug.Log("Boss Defeated!");
+
+        // Option 1: Play death animation
+        // anim.SetTrigger("die"); 
+
+        // Option 2: Just destroy or disable for now
+        SceneManager.LoadScene("Main Menu");
+
+        // Next step: You can trigger a "Victory" UI here
     }
 }
