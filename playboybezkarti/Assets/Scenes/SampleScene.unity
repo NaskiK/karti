@@ -2019,11 +2019,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 677185312}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 25}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 400, y: 400}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 1, y: 0}
 --- !u!114 &883003363
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -98616,7 +98616,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8546003576576199431, guid: 8fd07ba3914fd12469c3aacd36c0b289, type: 3}
       propertyPath: maxToSpawn
-      value: 70
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 8546003576576199431, guid: 8fd07ba3914fd12469c3aacd36c0b289, type: 3}
       propertyPath: moleScript
