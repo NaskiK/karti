@@ -17802,9 +17802,17 @@ PrefabInstance:
       value: CompanionNPC
       objectReference: {fileID: 0}
     - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
+      propertyPath: fleeSpeed
+      value: 2.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: anchorPoint
       value: 
       objectReference: {fileID: 555012554}
+    - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
+      propertyPath: followSpeed
+      value: 1.4
+      objectReference: {fileID: 0}
     - target: {fileID: 8980843779975710849, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: m_Radius
       value: 0.11890434
