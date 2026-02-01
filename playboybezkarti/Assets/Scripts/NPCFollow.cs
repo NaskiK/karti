@@ -9,8 +9,8 @@ public class NPCFollow : MonoBehaviour
     public float fleeSpeed = 5f;
     public float wanderRadius = 3f;
     public float detectionRange = 2.5f;
-    public float wallAvoidanceRange = 1.0f; // How far he looks for walls
-    public LayerMask wallLayer;             // Set this to your "World" or "Walls" layer
+    public float wallAvoidanceRange = 1.0f;
+    public LayerMask wallLayer;
 
     private Vector2 targetPos;
     private float timer;
@@ -20,20 +20,44 @@ public class NPCFollow : MonoBehaviour
     private float lastX;
     private float lastY = -1f;
 
+    // --- EXIT LOGIC ---
+    private bool isLeaving = false;
+    private Vector2 exitDirection = new Vector2(0, -1); // Walks DOWN to leave
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         if (anchorPoint == null) anchorPoint = GameObject.FindGameObjectWithTag("Player")?.transform;
 
-        // IMPORTANT: Ensure "Is Trigger" is ON so he doesn't physically get stuck,
-        // but we will use the script below to "pretend" he hits walls.
         SetNewRandomTarget();
+    }
+
+    public void LeaveMap()
+    {
+        isLeaving = true;
+        // Disable physics so he can walk through walls/colliders
+        if (rb != null)
+        {
+            rb.simulated = false;
+            rb.linearVelocity = Vector2.zero;
+        }
+        // Delete the object after 5 seconds of walking away
+        Destroy(gameObject, 5f);
     }
 
     void FixedUpdate()
     {
         if (rb == null) return;
+
+        // If we are in "Exit Mode", ignore all AI logic and just walk away
+        if (isLeaving)
+        {
+            transform.Translate(exitDirection * followSpeed * Time.fixedDeltaTime);
+            UpdateDirectionParams(exitDirection);
+            UpdateAnimation(true);
+            return;
+        }
 
         Vector2 fleeDir = CalculateFleeDirection();
         Vector2 finalMoveDir = Vector2.zero;
@@ -74,21 +98,14 @@ public class NPCFollow : MonoBehaviour
         }
     }
 
-    // This is the "Steering" logic
     Vector2 AvoidWalls(Vector2 desiredDir)
     {
-        // Raycast (whisker) in front of the mole
         RaycastHit2D hit = Physics2D.Raycast(transform.position, desiredDir, wallAvoidanceRange, wallLayer);
-
         if (hit.collider != null)
         {
-            // If we hit a wall, find a direction perpendicular to the wall to steer away
             Vector2 avoidanceDir = Vector2.Perpendicular(hit.normal).normalized;
-
-            // Blend the desired direction with the avoidance direction
             return (desiredDir + avoidanceDir).normalized;
         }
-
         return desiredDir;
     }
 
