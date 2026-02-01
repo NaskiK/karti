@@ -17,6 +17,8 @@ public class PlayerMask : MonoBehaviour
     public Sprite fireIdleFront;
     public Sprite fireIdleBack;
     public Sprite fireIdleSide;
+    private float icePulseTimer;
+
 
     [Header("Ice Mask Sprites")]
     public Sprite iceIdleFront;
@@ -87,12 +89,34 @@ public class PlayerMask : MonoBehaviour
 
         bool active = currentMask == MaskType.Ice;
         iceAOEVisual.gameObject.SetActive(active);
-
         if (!active) return;
 
-        float diameter = stats.iceAOERadius * 2f;
-        iceAOEVisual.localScale = new Vector3(diameter, diameter, 1f);
+        SpriteRenderer sr = iceAOEVisual.GetComponent<SpriteRenderer>();
+        if (sr == null) return;
+
+        float baseDiameter = stats.iceAOERadius * 2f;
+        Vector2 spriteSize = sr.sprite.bounds.size;
+
+        // ===== PULSE =====
+        icePulseTimer += Time.deltaTime;
+
+        // 1 pulse per second
+        float pulse = (Mathf.Sin(icePulseTimer * Mathf.PI * 2f) + 1f) * 0.5f;
+        float pulseScale = Mathf.Lerp(1f, 1.05f, pulse);
+
+        iceAOEVisual.localScale = new Vector3(
+            (baseDiameter / spriteSize.x) * pulseScale,
+            (baseDiameter / spriteSize.y) * pulseScale,
+            1f
+        );
+
+        // Optional: pulse alpha
+        Color c = sr.color;
+        c.a = Mathf.Lerp(0.2f, 0.45f, pulse);
+        sr.color = c;
     }
+
+
 
 
     // ================= FIREBALL =================
@@ -109,10 +133,10 @@ public class PlayerMask : MonoBehaviour
             Vector3 dir = mousePos - transform.position;
 
             if (sfx != null)
-                sfx.PlayOneShot(sfx.fireballShoot, 0.8f);
-            
+                sfx.PlayOneShot(sfx.fireballShoot, 0.3f);
 
-                GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
+
+            GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
             fb.GetComponent<Fireball>().Initialize(dir);
 
             // Use cooldown from PlayerStats
