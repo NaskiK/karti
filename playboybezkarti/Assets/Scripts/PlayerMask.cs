@@ -40,11 +40,17 @@ public class PlayerMask : MonoBehaviour
     private float wiggleFrequency = 0.1f; // 0.1 seconds per toggle
     private float wiggleAmount = 0.01f;   // 1 pixel in Unity units
 
+    [SerializeField] private SFXManager sfx;
+
     void Awake()
     {
         movement = GetComponent<PlayerMovement>();
         stats = GetComponent<PlayerStats>();
         iceCollider = GetComponent<CircleCollider2D>();
+
+        if (sfx == null)
+            sfx = FindObjectOfType<SFXManager>();
+        else Debug.Log("No SFX in mask");
 
         Transform maskChild = transform.Find("Mask");
         if (maskChild != null)
@@ -102,7 +108,11 @@ public class PlayerMask : MonoBehaviour
             mousePos.z = 0;
             Vector3 dir = mousePos - transform.position;
 
-            GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
+            if (sfx != null)
+                sfx.PlayOneShot(sfx.fireballShoot, 0.8f);
+            
+
+                GameObject fb = Instantiate(fireballPrefab, transform.position, Quaternion.identity);
             fb.GetComponent<Fireball>().Initialize(dir);
 
             // Use cooldown from PlayerStats
@@ -135,7 +145,8 @@ public class PlayerMask : MonoBehaviour
                     SendMessageOptions.DontRequireReceiver
                 );
             }
-
+            if (sfx != null)
+                sfx.PlayOneShot(sfx.iceFieldLoop, 0.8f);
             iceTickTimer = 1f;
         }
     }
