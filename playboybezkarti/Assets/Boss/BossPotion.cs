@@ -25,6 +25,10 @@ public class BossPotion : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
+            if (collision is CircleCollider2D)
+            {
+                return; // Ignore this specific collider and keep flying!
+            }
             // Add your explosion/poison effect logic here!
             Destroy(gameObject);
         }
