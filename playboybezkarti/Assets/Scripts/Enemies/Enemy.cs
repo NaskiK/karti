@@ -29,6 +29,17 @@ public class Enemy : MonoBehaviour
     private bool isSlowed = false;
     private float slowMultiplier = 1f;
 
+
+    [SerializeField] private SFXManager sfx;
+
+    void Awake()
+    {
+        if (sfx == null)
+            sfx = FindObjectOfType<SFXManager>();
+        else Debug.Log("No SFX in enemy");
+    }
+
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -86,6 +97,10 @@ public class Enemy : MonoBehaviour
     public void TakeDamage(int damageAmount)
     {
         currentHealth -= damageAmount;
+
+        if (sfx != null)
+            sfx.PlayOneShot(sfx.enemyHit, 0.7f);
+
         currentHealth = Mathf.Max(currentHealth, 0);
 
         if (animator != null) animator.SetTrigger("Hurt");
@@ -98,6 +113,9 @@ public class Enemy : MonoBehaviour
     {
         if (deathEffect != null)
             Instantiate(deathEffect, transform.position, Quaternion.identity);
+
+        if (sfx != null)
+            sfx.PlayOneShot(sfx.enemyDeath, 1f);
 
         GiveXP();
         Destroy(gameObject);
@@ -153,6 +171,8 @@ public class Enemy : MonoBehaviour
             PlayerStats stats = player.GetComponent<PlayerStats>();
             if (stats != null)
             {
+                if (sfx != null)
+                    sfx.PlayOneShot(sfx.enemyAttack, 0.8f);
                 stats.TakeDamage(contactDamage);
             }
         }
