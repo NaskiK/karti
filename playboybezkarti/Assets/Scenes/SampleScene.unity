@@ -655,7 +655,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6132673779289675501, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: maxHealth
-      value: 5
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 7343860501978136744, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: m_Name
@@ -663,7 +663,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: fleeSpeed
-      value: 0.001
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: anchorPoint
@@ -671,7 +671,7 @@ PrefabInstance:
       objectReference: {fileID: 191246324}
     - target: {fileID: 7663028919791586328, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: followSpeed
-      value: 0.001
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8980843779975710849, guid: 5ae5da2cb6bbacc478749e1e9eb7f451, type: 3}
       propertyPath: m_Radius
