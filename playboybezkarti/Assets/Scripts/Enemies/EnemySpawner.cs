@@ -6,40 +6,66 @@ public class EnemySpawner : MonoBehaviour
     public GameObject enemyPrefab;
     public GameObject spawnEffectPrefab;
 
+    [Header("Companion Settings")]
+    public NPCFollow moleScript; // Drag the CompanionNPC here
+
     [Header("Spawn Timing")]
     public float spawnInterval = 1.5f;
     public float spawnDelay = 0.3f;
 
     [Header("Exclusion Settings")]
-    public LayerMask forbiddenLayer; // Set this to "Forbidden" in Inspector
-    public float checkRadius = 0.5f; // How big of a 'safe gap' to check for
+    public LayerMask forbiddenLayer;
+    public float checkRadius = 0.5f;
+
+    [Header("Kill Tracker")]
+    public int maxToSpawn = 10;
+    private int spawnedCount = 0;
+    private int killedCount = 0;
 
     private float timer;
     private bool isPlayerInside = false;
+    private bool hasFinished = false;
 
     void Update()
     {
-        if (isPlayerInside)
+        if (hasFinished) return;
+
+        if (isPlayerInside && spawnedCount < maxToSpawn)
         {
             timer += Time.deltaTime;
-
             if (timer >= spawnInterval)
             {
                 StartCoroutine(SpawnRoutine());
                 timer = 0f;
             }
         }
-        else
+
+        // Check if all enemies are dead
+        if (spawnedCount >= maxToSpawn && killedCount >= maxToSpawn)
         {
-            timer = 0f;
+            FinishLevel();
         }
     }
+
+    void FinishLevel()
+    {
+        hasFinished = true;
+        if (moleScript != null)
+        {
+            moleScript.LeaveMap(); // Tell the mole to walk through walls and leave
+        }
+        Debug.Log("Cursed Woods Cleared!");
+        // Keep the spawner object for a moment, then disable
+        Invoke("DisableSpawner", 0.5f);
+    }
+
+    void DisableSpawner() => gameObject.SetActive(false);
 
     IEnumerator SpawnRoutine()
     {
         Vector3 spawnPosition = Vector3.zero;
         bool foundValidSpot = false;
-        int maxAttempts = 10; // Don't loop forever if area is full
+        int maxAttempts = 10;
         int currentAttempt = 0;
 
         while (!foundValidSpot && currentAttempt < maxAttempts)
@@ -48,50 +74,33 @@ public class EnemySpawner : MonoBehaviour
             float randomY = Random.Range(-transform.localScale.y / 2, transform.localScale.y / 2);
             spawnPosition = transform.position + new Vector3(randomX, randomY, 0);
 
-            // Check if there is anything on the "Forbidden" layer at this spot
             Collider2D hit = Physics2D.OverlapCircle(spawnPosition, checkRadius, forbiddenLayer);
-
-            if (hit == null)
-            {
-                foundValidSpot = true;
-            }
+            if (hit == null) foundValidSpot = true;
             currentAttempt++;
         }
 
-        // Only spawn if we actually found a safe spot
         if (foundValidSpot)
         {
-            if (spawnEffectPrefab != null)
-            {
-                Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
-            }
-
+            spawnedCount++;
+            if (spawnEffectPrefab != null) Instantiate(spawnEffectPrefab, spawnPosition, Quaternion.identity);
             yield return new WaitForSeconds(spawnDelay);
             Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         }
-        else
-        {
-            Debug.LogWarning("Spawner could not find a valid spot (everything is blocked!)");
-        }
     }
 
-    // --- TRIGGER DETECTION ---
+    public void RegisterKill()
+    {
+        killedCount++;
+    }
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = true;
-            Debug.Log("Player entered the Cursed Woods! Spawning started.");
-        }
+        if (other.CompareTag("Player")) isPlayerInside = true;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            isPlayerInside = false;
-            Debug.Log("Player left the zone. Spawning stopped.");
-        }
+        if (other.CompareTag("Player")) isPlayerInside = false;
     }
 
     private void OnDrawGizmos()
