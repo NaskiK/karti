@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NPCStats : MonoBehaviour
 {
@@ -25,6 +26,6 @@ public class NPCStats : MonoBehaviour
     {
         // For now, he just disappears. Later you can add a burrow animation!
         Debug.Log("Mole fainted!");
-        gameObject.SetActive(false);
+        SceneManager.LoadScene("DeathScene");
     }
 }
